@@ -25,6 +25,7 @@ namespace FanSync
         public event Action OnChanged;
 
         private bool closing;
+        private bool clearClipboard;
 
         public MainWindow(App app, Settings settings)
         {
@@ -32,6 +33,7 @@ namespace FanSync
             InitializeComponent();
             this.settings = settings;
             closing = false;
+            clearClipboard = false;
 
             if (settings.session_cookie != null)
             {
@@ -45,6 +47,8 @@ namespace FanSync
 
             ToggleFanboxCookieInput(false);
             ToggleFansyncTokenInput(false);
+
+            DataObject.AddPastingHandler(FanboxCookie, OnCookiePaste);
 
             app.importer.OnStatus += Importer_Status;
         }
@@ -99,6 +103,11 @@ namespace FanSync
             base.OnClosing(e);
         }
 
+        public void OnCookiePaste(object sender, DataObjectPastingEventArgs e)
+        {
+            if (!e.IsDragDrop)
+                clearClipboard = true;
+        }
         public static bool IsSimilar(string left, string right)
         {
             return (string.IsNullOrEmpty(left) && string.IsNullOrEmpty(right)) || left == right;
@@ -109,6 +118,13 @@ namespace FanSync
             ApplyButton.IsEnabled =
                     !IsSimilar(FanboxCookie.Text, settings.session_cookie) ||
                     !IsSimilar(FansyncToken.Text, settings.token);
+            
+            if (sender == FanboxCookie && clearClipboard)
+            {
+                System.Windows.Forms.Clipboard.Clear();
+            }
+
+            clearClipboard = false;
         }
 
         private void DisplayError(string message)
