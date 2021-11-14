@@ -205,7 +205,7 @@ namespace FanSync.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error while contacting Fanbox..
+        ///   Looks up a localized string similar to FanSync has ran into an error while getting pledge data from Fanbox..
         /// </summary>
         public static string lbl_status_fanbox_error {
             get {
@@ -214,7 +214,7 @@ namespace FanSync.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error while contacting FanSync..
+        ///   Looks up a localized string similar to FanSync has ran into an error while uploading pledge data..
         /// </summary>
         public static string lbl_status_fansync_error {
             get {

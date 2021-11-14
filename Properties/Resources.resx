@@ -166,10 +166,10 @@
     <value>Reset Settings</value>
   </data>
   <data name="lbl_status_fanbox_error" xml:space="preserve">
-    <value>Error while contacting Fanbox.</value>
+    <value>FanSync has ran into an error while getting pledge data from Fanbox.</value>
   </data>
   <data name="lbl_status_fansync_error" xml:space="preserve">
-    <value>Error while contacting FanSync.</value>
+    <value>FanSync has ran into an error while uploading pledge data.</value>
   </data>
   <data name="lbl_status_success" xml:space="preserve">
     <value>Successfully updated pledges.</value>

@@ -13,7 +13,7 @@ namespace FanSync
         public static void Show(string title, string message, Dictionary<string, string> data = null, Dictionary<string, string> actions = null)
         {
             var notif = new ToastContentBuilder();
-            notif.AddText(title);
+            //notif.AddText(title);
             notif.AddText(message);
 
             if (data != null)
