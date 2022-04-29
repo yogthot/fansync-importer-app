@@ -35,9 +35,12 @@ namespace FanSync
         public PledgeImporter(Settings settings)
         {
             this.settings = settings;
+
             fanbox = new FanboxClient(settings);
             fansync = new FansyncClient(settings);
+
             signalThread = new Semaphore(0, 1);
+
             thread = new Thread(this.Run);
             IsRunning = false;
         }
@@ -61,6 +64,7 @@ namespace FanSync
             IsRunning = false;
         }
 
+        // waits for next command, or updates on timeout
         private bool Wait(bool first = false)
         {
             TimeSpan waitTime = TimeSpan.FromSeconds(SecondsBetweenUpdate);
@@ -97,6 +101,7 @@ namespace FanSync
 
         private async void Run()
         {
+            // initial wait to offset possible update in previous execution
             if (!Wait(true))
                 return;
 
@@ -142,18 +147,18 @@ namespace FanSync
                     }
                     consecutiveFansyncErrors = 0;
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     // if anything fails, just try again later
                     // maybe warn the user if it fails for more than 3 times
                     // TODO log?
                 }
 
-                if (consecutiveFanboxErrors == 3)
+                if (consecutiveFanboxErrors > 0 && consecutiveFanboxErrors % 3 == 0)
                 {
                     Notification.Show(Res.title_error, Res.exc_fanbox_cookie, Notification.Action("settings"));
                 }
-                else if (consecutiveFansyncErrors == 3)
+                if (consecutiveFansyncErrors > 0 && consecutiveFansyncErrors % 3 == 0)
                 {
                     Notification.Show(Res.title_error, Res.exc_fansync_token, Notification.Action("settings"));
                 }
@@ -161,7 +166,7 @@ namespace FanSync
                 DateTimeOffset now = DateTimeOffset.Now;
                 settings.last_update_time = now;
                 OnStatus?.Invoke(this, new ImporterStatus(now, consecutiveFanboxErrors == 0, consecutiveFansyncErrors == 0));
-
+                
                 if (!Wait())
                     return;
             }

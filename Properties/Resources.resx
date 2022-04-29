@@ -151,7 +151,7 @@
     <value>FanSync token:</value>
   </data>
   <data name="lbl_force_update" xml:space="preserve">
-    <value>Force Supporter Update</value>
+    <value>Update Supporters</value>
   </data>
   <data name="lbl_loading" xml:space="preserve">
     <value>Loading...</value>

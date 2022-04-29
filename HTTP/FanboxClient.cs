@@ -77,7 +77,7 @@ namespace FanSync.HTTP
                     return Util.NavigateJson(json, "context", "user", "userId").ToObject<string>();
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 // TODO log (in case it keeps happening)
                 return null;

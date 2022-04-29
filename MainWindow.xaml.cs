@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,8 +32,9 @@ namespace FanSync
         public MainWindow(App app, Settings settings)
         {
             this.app = app;
-            InitializeComponent();
             this.settings = settings;
+            InitializeComponent();
+
             closing = false;
             clearClipboard = false;
 
@@ -48,9 +51,44 @@ namespace FanSync
             ToggleFanboxCookieInput(false);
             ToggleFansyncTokenInput(false);
 
-            DataObject.AddPastingHandler(FanboxCookie, OnCookiePaste);
+            // quick check for clearing the cookie from the clipboard
+            DataObject.AddPastingHandler(FanboxCookie, (object sender, DataObjectPastingEventArgs e) =>
+            {
+                if (!e.IsDragDrop) clearClipboard = true;
+            });
 
             app.importer.OnStatus += Importer_Status;
+        }
+
+        public void Exit()
+        {
+            closing = true;
+            Close();
+        }
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            this.Hide();
+            ToggleFanboxCookieInput(false);
+            ToggleFansyncTokenInput(false);
+
+            // prevent closing unless explicitly closed from code
+            e.Cancel = !closing;
+            base.OnClosing(e);
+        }
+
+        private void Window_Activated(object sender, EventArgs e)
+        {
+            if (!app.isUpToDate)
+            {
+                VersionStatus.Visibility = Visibility.Visible;
+            }
+
+            UpdateBtn.IsEnabled = !string.IsNullOrEmpty(settings.session_cookie) &&
+                                  !string.IsNullOrEmpty(settings.token);
+        }
+        private void VersionStatus_Click(object sender, MouseButtonEventArgs e)
+        {
+            Process.Start(app.updateUrl);
         }
 
         public void Importer_Status(object sender, ImporterStatus e)
@@ -73,71 +111,53 @@ namespace FanSync
             }));
         }
 
-        private void Window_Activated(object sender, EventArgs e)
+        #region status tab
+        private void Update_Click(object sender, RoutedEventArgs e)
         {
-            if (!app.isUpToDate)
-            {
-                // not like it can update itself
-                VersionStatus.Foreground = Brushes.Red;
-                VersionStatus.Content = Res.lbl_update_available;
-            }
+            app.importer.ForceUpdate();
+        }
+        #endregion
 
-            UpdateBtn.IsEnabled = !string.IsNullOrEmpty(settings.session_cookie) &&
-                                  !string.IsNullOrEmpty(settings.token);
+        #region settings tab
+        private void ToggleFanboxCookieInput(bool active)
+        {
+            if (string.IsNullOrEmpty(FanboxCookie.Text))
+                active = true;
+
+            FanboxCookie.Visibility = active ? Visibility.Visible : Visibility.Hidden;
+            FanboxCookieLabel.Visibility = !active ? Visibility.Visible : Visibility.Hidden;
+        }
+        private void ToggleFansyncTokenInput(bool active)
+        {
+            if (string.IsNullOrEmpty(FansyncToken.Text))
+                active = true;
+
+            FansyncToken.Visibility = active ? Visibility.Visible : Visibility.Hidden;
+            FansyncTokenLabel.Visibility = !active ? Visibility.Visible : Visibility.Hidden;
         }
 
-        public void Exit()
+        private void FansyncTokenLabel_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            closing = true;
-            Close();
+            ToggleFansyncTokenInput(true);
+        }
+        private void FanboxCookieLabel_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            ToggleFanboxCookieInput(true);
         }
 
-        protected override void OnClosing(CancelEventArgs e)
-        {
-            this.Hide();
-            ToggleFanboxCookieInput(false);
-            ToggleFansyncTokenInput(false);
-
-            // prevent closing unless explicitly closed from code
-            e.Cancel = !closing;
-            base.OnClosing(e);
-        }
-
-        public void OnCookiePaste(object sender, DataObjectPastingEventArgs e)
-        {
-            if (!e.IsDragDrop)
-                clearClipboard = true;
-        }
-        public static bool IsSimilar(string left, string right)
-        {
-            return (string.IsNullOrEmpty(left) && string.IsNullOrEmpty(right)) || left == right;
-        }
         private void Form_Changed(object sender, TextChangedEventArgs e)
         {
             // apply only enabled when values are changed
             ApplyButton.IsEnabled =
-                    !IsSimilar(FanboxCookie.Text, settings.session_cookie) ||
-                    !IsSimilar(FansyncToken.Text, settings.token);
-            
+                    !FanboxCookie.Text.IsSimilar(settings.session_cookie) ||
+                    !FansyncToken.Text.IsSimilar(settings.token);
+
             if (sender == FanboxCookie && clearClipboard)
             {
-                System.Windows.Forms.Clipboard.Clear();
+                Clipboard.Clear();
             }
 
             clearClipboard = false;
-        }
-
-        private void DisplayError(string message)
-        {
-            if (message != null)
-            {
-                ErrorLabel.Content = message;
-                ErrorLabel.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                ErrorLabel.Visibility = Visibility.Hidden;
-            }
         }
 
         private async Task<bool> SaveSettings()
@@ -188,7 +208,8 @@ namespace FanSync
                 }
             }
 
-            if (save) {
+            if (save)
+            {
                 await settings.Save();
                 OnChanged?.Invoke();
             }
@@ -202,37 +223,21 @@ namespace FanSync
             return !error;
         }
 
-        private void ToggleFanboxCookieInput(bool active)
+        private void DisplayError(string message)
         {
-            if (string.IsNullOrEmpty(FanboxCookie.Text))
-                active = true;
+            if (message != null)
+            {
+                ErrorLabel.Content = message;
+                ErrorLabel.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                ErrorLabel.Visibility = Visibility.Hidden;
+            }
+        }
+        #endregion
 
-            FanboxCookie.Visibility = active ? Visibility.Visible : Visibility.Hidden;
-            FanboxCookieLabel.Visibility = !active ? Visibility.Visible : Visibility.Hidden;
-        }
-        private void ToggleFansyncTokenInput(bool active)
-        {
-            if (string.IsNullOrEmpty(FansyncToken.Text))
-                active = true;
-
-            FansyncToken.Visibility = active ? Visibility.Visible : Visibility.Hidden;
-            FansyncTokenLabel.Visibility = !active ? Visibility.Visible : Visibility.Hidden;
-        }
-
-        private void FansyncTokenLabel_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            ToggleFansyncTokenInput(true);
-        }
-        private void FanboxCookieLabel_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            ToggleFanboxCookieInput(true);
-        }
-
-        private void Update_Click(object sender, RoutedEventArgs e)
-        {
-            app.importer.ForceUpdate();
-        }
-        
+        #region advanced tab
         private async void Reset_Click(object sender, RoutedEventArgs e)
         {
             Settings def = Settings.DefaultSettings;
@@ -247,6 +252,9 @@ namespace FanSync
 
             await settings.Save();
         }
+        #endregion
+
+        #region bottom buttons
 
         private async void Ok_Click(object sender, RoutedEventArgs e)
         {
@@ -269,5 +277,6 @@ namespace FanSync
                 ApplyButton.IsEnabled = false;
             LoadingLabel.Visibility = Visibility.Hidden;
         }
+        #endregion
     }
 }

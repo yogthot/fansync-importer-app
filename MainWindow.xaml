@@ -85,7 +85,7 @@
                 <ColumnDefinition Width="Auto" SharedSizeGroup="A"></ColumnDefinition>
                 <ColumnDefinition Width="Auto" SharedSizeGroup="A"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <Label Name="VersionStatus" VerticalAlignment="Center"></Label>
+            <TextBlock Name="VersionStatus" Visibility="Hidden" Text="{x:Static res:Resources.lbl_update_available}" Foreground="Red" TextDecorations="Underline" VerticalAlignment="Center" Cursor="Hand" MouseLeftButtonUp="VersionStatus_Click" Padding="8 2"></TextBlock>
             
             <Button Click="Ok_Click" Content="{x:Static res:Resources.lbl_confirm}" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5" Padding="20 2"/>
             <Button Click="Cancel_Click" Content="{x:Static res:Resources.lbl_cancel}" Grid.Column="3" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5" Padding="20 2"/>

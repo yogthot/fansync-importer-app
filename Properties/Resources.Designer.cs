@@ -160,7 +160,7 @@ namespace FanSync.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Force Supporter Update.
+        ///   Looks up a localized string similar to Update Supporters.
         /// </summary>
         public static string lbl_force_update {
             get {

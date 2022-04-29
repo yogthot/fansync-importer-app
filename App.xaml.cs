@@ -26,6 +26,8 @@ namespace FanSync
         public static string PidFileName = "fansync.pid";
 
         public static string PidPath => $"{AppDomain.CurrentDomain.BaseDirectory}/{PidFileName}";
+        // must match the path in in Installer.nsi
+        public static string UninstallPath => $"{AppDomain.CurrentDomain.BaseDirectory}/uninstall.exe";
 
         public Settings settings;
         public MainWindow window;
@@ -37,6 +39,7 @@ namespace FanSync
         private bool? handleNotificationThenExit;
 
         public bool isUpToDate;
+        public string updateUrl => $"{settings.endpoint}/FanSyncSetup.exe";
 
         // cli flags
         private bool isInitialSetup;
@@ -69,7 +72,15 @@ namespace FanSync
                     handleNotificationThenExit = true;
 
                     DispatcherTimer timer = new DispatcherTimer();
-                    timer.Tick += ExitTimer;
+                    timer.Tick += async (object sender, EventArgs e) => 
+                    {
+                        // exit after some time if the notification event isn't called
+                        if (handleNotificationThenExit == true)
+                        {
+                            timer.Stop();
+                            await ExitAsync();
+                        }
+                    };
                     timer.Interval = new TimeSpan(0, 0, 5);
                     timer.Start();
                     return;
@@ -83,6 +94,7 @@ namespace FanSync
                 ToastNotificationManagerCompat.Uninstall();
             }
 
+            // handle multiple instances
             int pid = await CheckLock();
             if (pid != 0)
             {
@@ -125,38 +137,16 @@ namespace FanSync
             importer = new PledgeImporter(settings);
 
             window = new MainWindow(this, settings);
-            window.OnChanged += Settings_Changed;
+            // start the importer after the settings were set to valid values
+            window.OnChanged += () =>
+            {
+                if (!importer.IsRunning && settings.IsValid())
+                    importer.Start();
+            };
 
             if (settings.IsValid())
             {
-                // check and handle the service status
-                FansyncClient fansync = new FansyncClient(settings);
-                FansyncStatus status = await fansync.GetStatus();
-
-                if (status != null)
-                {
-                    switch (status.status)
-                    {
-                        case 1:
-                            Notification.Show(Res.title_out_of_service, Res.msg_out_of_service, Notification.Action("uninstall"));
-                            await this.ExitAsync();
-                            return;
-
-                        default:
-                            break;
-                    }
-
-                    if (!string.IsNullOrEmpty(status.latest_version))
-                    {
-                        Version currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
-                        Version latestVersion = new Version(status.latest_version);
-                        if (latestVersion > currentVersion)
-                        {
-                            isUpToDate = false;
-                            Notification.Show(Res.title_update, Res.msg_update, Notification.Action("update"));
-                        }
-                    }
-                }
+                await CheckFansyncStatus();
 
                 importer.Start();
             }
@@ -172,20 +162,7 @@ namespace FanSync
                 }
             }
 
-            // tray icon
-            trayIcon = new NotifyIcon();
-
-            // what the hell, Microsoft
-            trayIcon.Icon = Icon.ExtractAssociatedIcon(System.Reflection.Assembly.GetExecutingAssembly().Location);
-
-            trayIcon.ContextMenu = new System.Windows.Forms.ContextMenu();
-            trayIcon.ContextMenu.MenuItems.Add(Res.notify_settings, MenuSettings_Click);
-            trayIcon.ContextMenu.MenuItems.Add(Res.notify_exit, MenuExit_Click);
-
-            // default operation
-            trayIcon.DoubleClick += this.Notify_DblClick;
-
-            trayIcon.Visible = true;
+            CreateTrayMenu();
         }
         public async Task ExitAsync()
         {
@@ -220,17 +197,44 @@ namespace FanSync
             this.Shutdown();
         }
 
-        private void Notify_DblClick(object sender, EventArgs e)
+        #region macros
+        public void FocusStatus()
         {
-            this.FocusStatus();
+            window.WindowState = WindowState.Normal;
+            window.Tabs.SelectedIndex = 0;
+            window.Show();
+            window.Activate();
         }
-        private void MenuSettings_Click(object sender, EventArgs e)
+        public void FocusSettings()
         {
-            this.FocusSettings();
+            window.WindowState = WindowState.Normal;
+            window.Tabs.SelectedIndex = 1;
+            window.Show();
+            window.Activate();
         }
-        private async void MenuExit_Click(object sender, EventArgs e)
+        #endregion
+
+        #region init
+        private async Task<int> CheckLock()
         {
-            await ExitAsync();
+            try
+            {
+                pidFile = new FileStream(PidPath, FileMode.Create, FileAccess.Write, FileShare.Read, 4096, FileOptions.DeleteOnClose);
+                StreamWriter writer = new StreamWriter(pidFile, Encoding.UTF8);
+                int pid = Process.GetCurrentProcess().Id;
+                await writer.WriteAsync(Convert.ToString(pid));
+                await writer.FlushAsync();
+
+                return 0;
+            }
+            catch (IOException)
+            {
+                using (FileStream fs = File.Open(PidPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete))
+                {
+                    StreamReader reader = new StreamReader(fs, Encoding.UTF8);
+                    return Convert.ToInt32(await reader.ReadToEndAsync());
+                }
+            }
         }
 
         private async Task<bool> LoadSettings()
@@ -255,58 +259,73 @@ namespace FanSync
             }
             return true;
         }
-        private void Settings_Changed()
-        {
-            if (!importer.IsRunning && settings.IsValid())
-                importer.Start();
-        }
 
-        public void FocusStatus()
+        private async Task CheckFansyncStatus()
         {
-            window.WindowState = WindowState.Normal;
-            window.Tabs.SelectedIndex = 0;
-            window.Show();
-            window.Activate();
-        }
-        public void FocusSettings()
-        {
-            window.WindowState = WindowState.Normal;
-            window.Tabs.SelectedIndex = 1;
-            window.Show();
-            window.Activate();
-        }
+            FansyncClient fansync = new FansyncClient(settings);
+            FansyncStatus status = await fansync.GetStatus();
 
-        private async Task<int> CheckLock()
-        {
-            try
+            if (status != null)
             {
-                pidFile = new FileStream(PidPath, FileMode.Create, FileAccess.Write, FileShare.Read, 4096, FileOptions.DeleteOnClose);
-                StreamWriter writer = new StreamWriter(pidFile, Encoding.UTF8);
-                int pid = Process.GetCurrentProcess().Id;
-                await writer.WriteAsync(Convert.ToString(pid));
-                await writer.FlushAsync();
-
-                return 0;
-            }
-            catch (IOException)
-            {
-                using (FileStream fs = File.Open(PidPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete))
+                // handle static message responses
+                switch (status.status)
                 {
-                    StreamReader reader = new StreamReader(fs, Encoding.UTF8);
-                    return Convert.ToInt32(await reader.ReadToEndAsync());
+                    case 1:
+                        Notification.Show(Res.title_out_of_service, Res.msg_out_of_service, Notification.Action("uninstall"));
+                        await this.ExitAsync();
+                        return;
+
+                    default:
+                        break;
+                }
+
+                // handle updates
+                if (!string.IsNullOrEmpty(status.latest_version))
+                {
+                    Version currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
+                    Version latestVersion = new Version(status.latest_version);
+                    if (latestVersion > currentVersion)
+                    {
+                        isUpToDate = false;
+                        Notification.Show(Res.title_update, Res.msg_update, Notification.Action("update"));
+                    }
                 }
             }
         }
 
-        private async void ExitTimer(object sender, EventArgs e)
+        private void CreateTrayMenu()
         {
-            if (handleNotificationThenExit == true)
-            {
-                DispatcherTimer timer = (DispatcherTimer)sender;
-                timer.Stop();
-                await ExitAsync();
-            }
+            // tray icon
+            trayIcon = new NotifyIcon();
+
+            // what the hell, Microsoft
+            trayIcon.Icon = Icon.ExtractAssociatedIcon(System.Reflection.Assembly.GetExecutingAssembly().Location);
+
+            trayIcon.ContextMenu = new System.Windows.Forms.ContextMenu();
+            trayIcon.ContextMenu.MenuItems.Add(Res.notify_settings, MenuSettings_Click);
+            trayIcon.ContextMenu.MenuItems.Add(Res.notify_exit, MenuExit_Click);
+
+            // default operation
+            trayIcon.DoubleClick += this.Notify_DblClick;
+
+            trayIcon.Visible = true;
         }
+        #endregion
+
+        #region tray menu events
+        private void Notify_DblClick(object sender, EventArgs e)
+        {
+            this.FocusStatus();
+        }
+        private void MenuSettings_Click(object sender, EventArgs e)
+        {
+            this.FocusSettings();
+        }
+        private async void MenuExit_Click(object sender, EventArgs e)
+        {
+            await ExitAsync();
+        }
+        #endregion
 
         public void OnNotificationAction(ToastNotificationActivatedEventArgsCompat eventArgs)
         {
@@ -318,6 +337,8 @@ namespace FanSync
                 switch (action)
                 {
                     case "settings":
+                        handleNotificationThenExit = false;
+                        await Start();
                         FocusSettings();
                         break;
 
@@ -329,7 +350,7 @@ namespace FanSync
                         break;
 
                     case "update":
-                        // open update url
+                        Process.Start(updateUrl);
                         break;
 
                     case "exit":
@@ -337,7 +358,7 @@ namespace FanSync
                         break;
 
                     case "uninstall":
-                        // run uninstaller?
+                        Process.Start(UninstallPath);
                         break;
 
                     default:

@@ -48,6 +48,7 @@ namespace FanSync
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Include)]
         public DateTimeOffset? last_update_time { get; set; }
 
+
         public Settings()
         {
             cookies = new Dictionary<string, string>();

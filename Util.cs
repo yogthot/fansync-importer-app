@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace FanSync
 {
-    public class Util
+    public static class Util
     {
         public static HtmlDocument ParseHtml(string body)
         {
@@ -29,6 +29,11 @@ namespace FanSync
                 obj = ((JObject)obj).GetValue(key);
             }
             return obj;
+        }
+
+        public static bool IsSimilar(this string left, string right)
+        {
+            return (string.IsNullOrEmpty(left) && string.IsNullOrEmpty(right)) || left == right;
         }
     }
 }
