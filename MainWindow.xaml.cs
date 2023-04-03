@@ -28,6 +28,7 @@ namespace FanSync
 
         private bool closing;
         private bool clearClipboard;
+        private bool updating;
 
         public MainWindow(App app, Settings settings)
         {
@@ -37,6 +38,7 @@ namespace FanSync
 
             closing = false;
             clearClipboard = false;
+            updating = false;
 
             if (settings.session_cookie != null)
             {
@@ -84,7 +86,8 @@ namespace FanSync
             }
 
             UpdateBtn.IsEnabled = !string.IsNullOrEmpty(settings.session_cookie) &&
-                                  !string.IsNullOrEmpty(settings.token);
+                                  !string.IsNullOrEmpty(settings.token) &&
+                                  !updating;
         }
         private void VersionStatus_Click(object sender, MouseButtonEventArgs e)
         {
@@ -104,6 +107,10 @@ namespace FanSync
                 {
                     LastStatus.Content = Res.lbl_status_fansync_error;
                 }
+                else if (!e.NetworkStatus)
+                {
+                    LastStatus.Content = Res.lbl_status_network_error;
+                }
                 else
                 {
                     LastStatus.Content = Res.lbl_status_success;
@@ -114,7 +121,23 @@ namespace FanSync
         #region status tab
         private void Update_Click(object sender, RoutedEventArgs e)
         {
-            app.importer.ForceUpdate();
+            if (UpdateBtn.IsEnabled)
+            {
+                app.importer.ForceUpdate();
+
+                LastStatus.Content = Res.lbl_updating;
+                UpdateBtn.IsEnabled = false;
+                updating = true;
+                Task.Run(async () =>
+                {
+                    await Task.Delay(5000);
+                    await Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        UpdateBtn.IsEnabled = true;
+                        updating = false;
+                    }));
+                });
+            }
         }
         #endregion
 

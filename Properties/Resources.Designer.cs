@@ -205,7 +205,7 @@ namespace FanSync.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to FanSync has ran into an error while getting pledge data from Fanbox..
+        ///   Looks up a localized string similar to Error while getting pledge data from Fanbox..
         /// </summary>
         public static string lbl_status_fanbox_error {
             get {
@@ -214,11 +214,20 @@ namespace FanSync.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to FanSync has ran into an error while uploading pledge data..
+        ///   Looks up a localized string similar to Error while uploading pledge data..
         /// </summary>
         public static string lbl_status_fansync_error {
             get {
                 return ResourceManager.GetString("lbl_status_fansync_error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Network error..
+        /// </summary>
+        public static string lbl_status_network_error {
+            get {
+                return ResourceManager.GetString("lbl_status_network_error", resourceCulture);
             }
         }
         
@@ -255,6 +264,15 @@ namespace FanSync.Properties {
         public static string lbl_update_available {
             get {
                 return ResourceManager.GetString("lbl_update_available", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Updating....
+        /// </summary>
+        public static string lbl_updating {
+            get {
+                return ResourceManager.GetString("lbl_updating", resourceCulture);
             }
         }
         

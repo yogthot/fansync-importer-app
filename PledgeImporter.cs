@@ -1,5 +1,6 @@
 ﻿using FanSync.HTTP;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -25,8 +26,8 @@ namespace FanSync
         private FanboxClient fanbox;
         private FansyncClient fansync;
         private Thread thread;
-        private Semaphore signalThread;
-        private Signal signal;
+        private SemaphoreSlim signalThread;
+        private ConcurrentQueue<Signal> signalQueue;
 
         public bool IsRunning { get; private set; }
 
@@ -39,7 +40,8 @@ namespace FanSync
             fanbox = new FanboxClient(settings);
             fansync = new FansyncClient(settings);
 
-            signalThread = new Semaphore(0, 1);
+            signalThread = new SemaphoreSlim(0);
+            signalQueue = new ConcurrentQueue<Signal>();
 
             thread = new Thread(this.Run);
             IsRunning = false;
@@ -51,21 +53,31 @@ namespace FanSync
             IsRunning = true;
         }
 
+        private void SendSignal(Signal signal)
+        {
+            try
+            {
+                signalQueue.Enqueue(signal);
+                signalThread.Release();
+            }
+            catch (SemaphoreFullException)
+            {
+                // ignore
+            }
+        }
+
         public void ForceUpdate()
         {
-            signal = Signal.Update;
-            signalThread.Release();
+            SendSignal(Signal.Update);
         }
 
         public void Stop()
         {
-            signal = Signal.Stop;
-            signalThread.Release();
-            IsRunning = false;
+            SendSignal(Signal.Stop);
         }
 
         // waits for next command, or updates on timeout
-        private bool Wait(bool first = false)
+        private async Task<bool> Wait(bool first = false)
         {
             TimeSpan waitTime = TimeSpan.FromSeconds(SecondsBetweenUpdate);
             if (first)
@@ -82,17 +94,22 @@ namespace FanSync
                 waitTime = TimeSpan.FromSeconds(SecondsBetweenUpdate - difference);
             }
 
-            if (signalThread.WaitOne(waitTime))
+            
+            if (await signalThread.WaitAsync(waitTime))
             {
-                // received a signal
-                switch (signal)
+                if (signalQueue.TryDequeue(out Signal signal))
                 {
-                    case Signal.Stop:
-                        return false;
+                    // received a signal
+                    switch (signal)
+                    {
+                        case Signal.Stop:
+                            IsRunning = false;
+                            return false;
 
-                    case Signal.Update:
-                        // proceed normally
-                        break;
+                        case Signal.Update:
+                            // proceed normally
+                            break;
+                    }
                 }
             }
 
@@ -102,11 +119,12 @@ namespace FanSync
         private async void Run()
         {
             // initial wait to offset possible update in previous execution
-            if (!Wait(true))
+            if (!await Wait(true))
                 return;
 
             int consecutiveFanboxErrors = 0;
             int consecutiveFansyncErrors = 0;
+            bool networkError = false;
 
             while (true)
             {
@@ -121,7 +139,7 @@ namespace FanSync
                     }
                     catch (HttpRequestException)
                     {
-                        // ignore network related errors
+                        networkError = true;
                         throw;
                     }
                     catch
@@ -137,7 +155,7 @@ namespace FanSync
                     }
                     catch (HttpRequestException)
                     {
-                        // ignore network related errors
+                        networkError = true;
                         throw;
                     }
                     catch
@@ -165,9 +183,9 @@ namespace FanSync
 
                 DateTimeOffset now = DateTimeOffset.Now;
                 settings.last_update_time = now;
-                OnStatus?.Invoke(this, new ImporterStatus(now, consecutiveFanboxErrors == 0, consecutiveFansyncErrors == 0));
+                OnStatus?.Invoke(this, new ImporterStatus(now, consecutiveFanboxErrors == 0, consecutiveFansyncErrors == 0, !networkError));
                 
-                if (!Wait())
+                if (!await Wait())
                     return;
             }
         }
@@ -178,12 +196,14 @@ namespace FanSync
         public DateTimeOffset Timestamp { get; private set; }
         public bool FanboxStatus { get; private set; }
         public bool FansyncStatus { get; private set; }
+        public bool NetworkStatus { get; private set; }
 
-        public ImporterStatus(DateTimeOffset timestamp, bool fanboxStatus, bool fansyncStatus)
+        public ImporterStatus(DateTimeOffset timestamp, bool fanboxStatus, bool fansyncStatus, bool networkStatus)
         {
             Timestamp = timestamp;
             FanboxStatus = fanboxStatus;
             FansyncStatus = fanboxStatus;
+            NetworkStatus = networkStatus;
         }
     }
 }

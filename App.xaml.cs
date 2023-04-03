@@ -337,16 +337,24 @@ namespace FanSync
                 switch (action)
                 {
                     case "settings":
-                        handleNotificationThenExit = false;
-                        await Start();
+                        if (handleNotificationThenExit == true)
+                        {
+                            handleNotificationThenExit = false;
+                            await Start();
+                        }
                         FocusSettings();
                         break;
 
                     case "reset_config":
                         settings = Settings.DefaultSettings;
                         await settings.Save();
-                        handleNotificationThenExit = false;
-                        await Start();
+
+                        if (handleNotificationThenExit == true)
+                        {
+                            handleNotificationThenExit = false;
+                            await Start();
+                        }
+                        FocusSettings();
                         break;
 
                     case "update":

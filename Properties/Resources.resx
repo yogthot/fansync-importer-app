@@ -166,10 +166,13 @@
     <value>Reset Settings</value>
   </data>
   <data name="lbl_status_fanbox_error" xml:space="preserve">
-    <value>FanSync has ran into an error while getting pledge data from Fanbox.</value>
+    <value>Error while getting pledge data from Fanbox.</value>
   </data>
   <data name="lbl_status_fansync_error" xml:space="preserve">
-    <value>FanSync has ran into an error while uploading pledge data.</value>
+    <value>Error while uploading pledge data.</value>
+  </data>
+  <data name="lbl_status_network_error" xml:space="preserve">
+    <value>Network error.</value>
   </data>
   <data name="lbl_status_success" xml:space="preserve">
     <value>Successfully updated pledges.</value>
@@ -182,6 +185,9 @@
   </data>
   <data name="lbl_update_available" xml:space="preserve">
     <value>Update available.</value>
+  </data>
+  <data name="lbl_updating" xml:space="preserve">
+    <value>Updating...</value>
   </data>
   <data name="msg_out_of_service" xml:space="preserve">
     <value>FanSync has stopped being supported, please uninstall this application.</value>
