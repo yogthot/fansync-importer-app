@@ -22,7 +22,7 @@ namespace FanSync
 {
     public partial class App : Application
     {
-        public static string PipeName = "FanSync";
+        public string PipeName = "FanSync";
         public static string PidFileName = "fansync.pid";
 
         public static string PidPath => $"{AppDomain.CurrentDomain.BaseDirectory}/{PidFileName}";
@@ -54,6 +54,9 @@ namespace FanSync
         private async Task Start()
         {
             isUpToDate = true;
+
+            // set the pipe name to the same as executable to allow running multiple instances
+            PipeName = Process.GetCurrentProcess().ProcessName;
 
             string[] args = Environment.GetCommandLineArgs();
             if (args.Length >= 2)
