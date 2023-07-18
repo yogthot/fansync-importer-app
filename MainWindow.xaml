@@ -6,8 +6,7 @@
         xmlns:res="clr-namespace:FanSync.Properties"
         mc:Ignorable="d"
         Title="{x:Static res:Resources.title_main}" MinHeight="200" MinWidth="400"
-        SizeToContent="Height"
-        Background="#FFE5E5E5" Width="500"
+        SizeToContent="Height" Width="500"
         Activated="Window_Activated">
     <Grid>
         <Grid.RowDefinitions>

@@ -43,6 +43,46 @@ namespace FanSync.HTTP
             }
         }
 
+        public async Task<bool> SubmitPlans(string plans)
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                HttpRequestMessage fansyncRequest = new HttpRequestMessage()
+                {
+                    Method = HttpMethod.Post,
+                    RequestUri = new Uri($"{settings.endpoint}/api/creator/{settings.pixiv_id}/plans?token={settings.token}"),
+                    Content = new StringContent(plans)
+                };
+
+                HttpResponseMessage resp = await client.SendAsync(fansyncRequest);
+                if (resp.StatusCode == HttpStatusCode.Forbidden)
+                    throw new Exception("fansync token was rejected");
+
+                JObject json = JObject.Parse(await resp.Content.ReadAsStringAsync());
+                return json.GetValue("success").ToObject<bool>();
+            }
+        }
+        public async Task<bool> SubmitSupporters(string supporters)
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                HttpRequestMessage fansyncRequest = new HttpRequestMessage()
+                {
+                    Method = HttpMethod.Post,
+                    RequestUri = new Uri($"{settings.endpoint}/api/creator/{settings.pixiv_id}/supporters?token={settings.token}"),
+                    Content = new StringContent(supporters)
+                };
+
+                HttpResponseMessage resp = await client.SendAsync(fansyncRequest);
+                if (resp.StatusCode == HttpStatusCode.Forbidden)
+                    throw new Exception("fansync token was rejected");
+
+                JObject json = JObject.Parse(await resp.Content.ReadAsStringAsync());
+                return json.GetValue("success").ToObject<bool>();
+            }
+        }
+
+        // deprecated
         public async Task<bool> SubmitPledges(string month, string pledges)
         {
             using (HttpClient client = new HttpClient())

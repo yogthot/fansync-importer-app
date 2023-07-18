@@ -15,8 +15,6 @@ FANBOX_COOKIE = os.environ['FANBOX_COOKIE']
 PIXIV_ID = os.environ['PIXIV_ID']
 FANSYNC_TOKEN = os.environ['FANSYNC_TOKEN']
 
-month = datetime.now().strftime('%Y-%m')
-
 
 session = requests.Session()
 session.headers.update({
@@ -27,9 +25,14 @@ session.headers.update({
 cookie = requests.cookies.create_cookie(name='FANBOXSESSID', value=FANBOX_COOKIE)
 session.cookies.set_cookie(cookie)
 
-pledges = session.get('https://api.fanbox.cc/legacy/manage/pledge/monthly?month={}'.format(month))
-data = pledges.text
+plans = fanbox.get('https://api.fanbox.cc/plan.listCreator?userId={}'.format(PIXIV_ID))
+planData = plans.text
 
-url = 'https://fansync.moe/api/creator/{}/pledges'.format(PIXIV_ID)
-requests.post(url, params={'token': FANSYNC_TOKEN, 'month': month}, data=data)
+supporters = session.get('https://api.fanbox.cc/relationship.listFans?status=supporter')
+supporterData = supporters.text
+
+params = {'token': FANSYNC_TOKEN}
+# don't use the same session here
+requests.post('https://fansync.moe/api/creator/{}/plans'.format(PIXIV_ID), params=params, data=planData)
+requests.post('https://fansync.moe/api/creator/{}/supporters'.format(PIXIV_ID), params=params, data=supporterData)
 ```

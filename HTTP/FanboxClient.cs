@@ -19,6 +19,60 @@ namespace FanSync.HTTP
             this.settings = settings;
         }
 
+        public async Task<string> GetPlans()
+        {
+            CookieContainer fanboxCookies = new CookieContainer();
+            foreach (var cookie in settings.cookies)
+            {
+                fanboxCookies.Add(new Cookie(cookie.Key, cookie.Value) { Domain = "fanbox.cc" });
+            }
+
+            using (HttpClientHandler handler = new HttpClientHandler() { CookieContainer = fanboxCookies })
+            using (HttpClient client = new HttpClient(handler))
+            {
+                HttpRequestMessage fanboxRequest = new HttpRequestMessage()
+                {
+                    Method = HttpMethod.Get,
+                    RequestUri = new Uri($"https://api.fanbox.cc/plan.listCreator?userId={settings.pixiv_id}"),
+                    Headers = { }
+                };
+                foreach (var header in settings.headers)
+                {
+                    fanboxRequest.Headers.Add(header.Key, header.Value);
+                }
+
+                HttpResponseMessage resp = await client.SendAsync(fanboxRequest);
+                return await resp.Content.ReadAsStringAsync();
+            }
+        }
+        public async Task<string> GetSupporters()
+        {
+            CookieContainer fanboxCookies = new CookieContainer();
+            foreach (var cookie in settings.cookies)
+            {
+                fanboxCookies.Add(new Cookie(cookie.Key, cookie.Value) { Domain = "fanbox.cc" });
+            }
+
+            using (HttpClientHandler handler = new HttpClientHandler() { CookieContainer = fanboxCookies })
+            using (HttpClient client = new HttpClient(handler))
+            {
+                HttpRequestMessage fanboxRequest = new HttpRequestMessage()
+                {
+                    Method = HttpMethod.Get,
+                    RequestUri = new Uri($"https://api.fanbox.cc/relationship.listFans?status=supporter"),
+                    Headers = { }
+                };
+                foreach (var header in settings.headers)
+                {
+                    fanboxRequest.Headers.Add(header.Key, header.Value);
+                }
+
+                HttpResponseMessage resp = await client.SendAsync(fanboxRequest);
+                return await resp.Content.ReadAsStringAsync();
+            }
+        }
+
+        // deprecated
         public async Task<string> GetPledges(string month)
         {
             CookieContainer fanboxCookies = new CookieContainer();

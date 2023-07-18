@@ -132,10 +132,12 @@ namespace FanSync
                 {
                     string month = DateTimeOffset.Now.ToString("yyyy-MM");
 
-                    string pledgeData;
+                    string planData;
+                    string supporterData;
                     try
                     {
-                        pledgeData = await fanbox.GetPledges(month);
+                        planData = await fanbox.GetPlans();
+                        supporterData = await fanbox.GetSupporters();
                     }
                     catch (HttpRequestException)
                     {
@@ -151,7 +153,8 @@ namespace FanSync
 
                     try
                     {
-                        bool success = await fansync.SubmitPledges(month, pledgeData);
+                        await fansync.SubmitPlans(planData);
+                        await fansync.SubmitSupporters(supporterData);
                     }
                     catch (HttpRequestException)
                     {
