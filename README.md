@@ -13,7 +13,6 @@ from datetime import datetime
 
 FANBOX_COOKIE = os.environ['FANBOX_COOKIE']
 PIXIV_ID = os.environ['PIXIV_ID']
-CREATOR_ID = os.environ['CREATOR_ID']
 FANSYNC_TOKEN = os.environ['FANSYNC_TOKEN']
 
 
@@ -26,7 +25,7 @@ session.headers.update({
 cookie = requests.cookies.create_cookie(name='FANBOXSESSID', value=FANBOX_COOKIE)
 session.cookies.set_cookie(cookie)
 
-plans = fanbox.get('https://api.fanbox.cc/plan.listCreator?userId={}'.format(CREATOR_ID))
+plans = fanbox.get('https://api.fanbox.cc/plan.listCreator?userId={}'.format(PIXIV_ID))
 planData = plans.text
 
 supporters = session.get('https://api.fanbox.cc/relationship.listFans?status=supporter')
