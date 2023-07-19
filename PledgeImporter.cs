@@ -144,7 +144,7 @@ namespace FanSync
                         networkError = true;
                         throw;
                     }
-                    catch
+                    catch (Exception e)
                     {
                         consecutiveFanboxErrors++;
                         throw;
@@ -161,14 +161,14 @@ namespace FanSync
                         networkError = true;
                         throw;
                     }
-                    catch
+                    catch (Exception e)
                     {
                         consecutiveFansyncErrors++;
                         throw;
                     }
                     consecutiveFansyncErrors = 0;
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     // if anything fails, just try again later
                     // maybe warn the user if it fails for more than 3 times

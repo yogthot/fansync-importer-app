@@ -32,14 +32,22 @@ namespace FanSync.HTTP
             {
                 HttpRequestMessage fanboxRequest = new HttpRequestMessage()
                 {
+                    Version = HttpVersion.Version11,
                     Method = HttpMethod.Get,
                     RequestUri = new Uri($"https://api.fanbox.cc/plan.listCreator?userId={settings.pixiv_id}"),
                     Headers = { }
                 };
                 foreach (var header in settings.headers)
                 {
-                    fanboxRequest.Headers.Add(header.Key, header.Value);
+                    fanboxRequest.Headers.TryAddWithoutValidation(header.Key, header.Value);
                 }
+
+                if (!settings.headers.ContainsKey("Origin"))
+                    fanboxRequest.Headers.Add("Origin", "https://www.fanbox.cc");
+                if (!settings.headers.ContainsKey("Referer"))
+                    fanboxRequest.Headers.Add("Referer", "https://www.fanbox.cc/");
+                if (!settings.headers.ContainsKey("User-Agent"))
+                    fanboxRequest.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36");
 
                 HttpResponseMessage resp = await client.SendAsync(fanboxRequest);
                 return await resp.Content.ReadAsStringAsync();
@@ -58,14 +66,22 @@ namespace FanSync.HTTP
             {
                 HttpRequestMessage fanboxRequest = new HttpRequestMessage()
                 {
+                    Version = HttpVersion.Version11,
                     Method = HttpMethod.Get,
                     RequestUri = new Uri($"https://api.fanbox.cc/relationship.listFans?status=supporter"),
                     Headers = { }
                 };
                 foreach (var header in settings.headers)
                 {
-                    fanboxRequest.Headers.Add(header.Key, header.Value);
+                    fanboxRequest.Headers.TryAddWithoutValidation(header.Key, header.Value);
                 }
+
+                if (!settings.headers.ContainsKey("Origin"))
+                    fanboxRequest.Headers.Add("Origin", "https://www.fanbox.cc");
+                if (!settings.headers.ContainsKey("Referer"))
+                    fanboxRequest.Headers.Add("Referer", "https://www.fanbox.cc/");
+                if (!settings.headers.ContainsKey("User-Agent"))
+                    fanboxRequest.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36");
 
                 HttpResponseMessage resp = await client.SendAsync(fanboxRequest);
                 return await resp.Content.ReadAsStringAsync();
@@ -86,14 +102,22 @@ namespace FanSync.HTTP
             {
                 HttpRequestMessage fanboxRequest = new HttpRequestMessage()
                 {
+                    Version = HttpVersion.Version11,
                     Method = HttpMethod.Get,
                     RequestUri = new Uri($"https://api.fanbox.cc/legacy/manage/pledge/monthly?month={month}"),
                     Headers = { }
                 };
                 foreach (var header in settings.headers)
                 {
-                    fanboxRequest.Headers.Add(header.Key, header.Value);
+                    fanboxRequest.Headers.TryAddWithoutValidation(header.Key, header.Value);
                 }
+
+                if (!settings.headers.ContainsKey("Origin"))
+                    fanboxRequest.Headers.Add("Origin", "https://www.fanbox.cc");
+                if (!settings.headers.ContainsKey("Referer"))
+                    fanboxRequest.Headers.Add("Referer", "https://www.fanbox.cc/");
+                if (!settings.headers.ContainsKey("User-Agent"))
+                    fanboxRequest.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36");
 
                 HttpResponseMessage resp = await client.SendAsync(fanboxRequest);
                 return await resp.Content.ReadAsStringAsync();
