@@ -2,7 +2,7 @@
 Pledge importer for https://fansync.moe/
 
 ## Documentation
-All this application does is get supporter info from `https://api.fanbox.cc/legacy/manage/pledge/monthly?month={month}` and posts it to `https://fansync.moe/api/creator/{pixiv_id}/pledges?month={month}`.
+All this application does is get plan and supporter info from fanbox apis and then sends it to the corresponding fansync api.
 It has a few extra features to make it *just work*, but that's about it.
 
 If you're looking to implement something yourself, here's a barebones example of what the app does every hour.
@@ -13,6 +13,7 @@ from datetime import datetime
 
 FANBOX_COOKIE = os.environ['FANBOX_COOKIE']
 PIXIV_ID = os.environ['PIXIV_ID']
+CREATOR_ID = os.environ['CREATOR_ID']
 FANSYNC_TOKEN = os.environ['FANSYNC_TOKEN']
 
 
@@ -25,7 +26,7 @@ session.headers.update({
 cookie = requests.cookies.create_cookie(name='FANBOXSESSID', value=FANBOX_COOKIE)
 session.cookies.set_cookie(cookie)
 
-plans = fanbox.get('https://api.fanbox.cc/plan.listCreator?userId={}'.format(PIXIV_ID))
+plans = fanbox.get('https://api.fanbox.cc/plan.listCreator?userId={}'.format(CREATOR_ID))
 planData = plans.text
 
 supporters = session.get('https://api.fanbox.cc/relationship.listFans?status=supporter')
