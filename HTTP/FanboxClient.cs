@@ -10,6 +10,17 @@ using System.Windows.Forms;
 
 namespace FanSync.HTTP
 {
+    public class FanboxAPIError : Exception
+    {
+        public string Content;
+
+        public FanboxAPIError(string message, string content)
+            : base(message)
+        {
+            Content = content;
+        }
+    }
+
     public class FanboxClient
     {
         private Settings settings;
@@ -50,7 +61,16 @@ namespace FanSync.HTTP
                     fanboxRequest.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36");
 
                 HttpResponseMessage resp = await client.SendAsync(fanboxRequest);
-                return await resp.Content.ReadAsStringAsync();
+                string content = await resp.Content.ReadAsStringAsync();
+
+                JObject json = JObject.Parse(content);
+                string error = Util.NavigateJson(json, "error")?.ToObject<string>();
+                if (error != null)
+                {
+                    throw new FanboxAPIError(error, content);
+                }
+
+                return content;
             }
         }
         public async Task<string> GetSupporters()
@@ -84,7 +104,16 @@ namespace FanSync.HTTP
                     fanboxRequest.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36");
 
                 HttpResponseMessage resp = await client.SendAsync(fanboxRequest);
-                return await resp.Content.ReadAsStringAsync();
+                string content = await resp.Content.ReadAsStringAsync();
+
+                JObject json = JObject.Parse(content);
+                string error = Util.NavigateJson(json, "error")?.ToObject<string>();
+                if (error != null)
+                {
+                    throw new FanboxAPIError(error, content);
+                }
+
+                return content;
             }
         }
 

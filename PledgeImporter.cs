@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -29,6 +30,8 @@ namespace FanSync
         private SemaphoreSlim signalThread;
         private ConcurrentQueue<Signal> signalQueue;
 
+        private Logger logger;
+
         public bool IsRunning { get; private set; }
 
         public event Action<object, ImporterStatus> OnStatus;
@@ -45,6 +48,9 @@ namespace FanSync
 
             thread = new Thread(this.Run);
             IsRunning = false;
+
+            string folder = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
+            logger = new Logger(Path.Combine(folder, "importer.log"));
         }
 
         public void Start()
@@ -130,7 +136,7 @@ namespace FanSync
             {
                 try
                 {
-                    string month = DateTimeOffset.Now.ToString("yyyy-MM");
+                    //string month = DateTimeOffset.Now.ToString("yyyy-MM");
 
                     string planData;
                     string supporterData;
@@ -144,7 +150,7 @@ namespace FanSync
                         networkError = true;
                         throw;
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         consecutiveFanboxErrors++;
                         throw;
@@ -161,18 +167,21 @@ namespace FanSync
                         networkError = true;
                         throw;
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         consecutiveFansyncErrors++;
                         throw;
                     }
                     consecutiveFansyncErrors = 0;
                 }
+                catch (FanboxAPIError e)
+                {
+                    logger.Error(e.Content);
+                    logger.Error(e.ToString());
+                }
                 catch (Exception e)
                 {
-                    // if anything fails, just try again later
-                    // maybe warn the user if it fails for more than 3 times
-                    // TODO log?
+                    logger.Error(e.ToString());
                 }
 
                 if (consecutiveFanboxErrors > 0 && consecutiveFanboxErrors % 3 == 0)

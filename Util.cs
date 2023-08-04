@@ -26,6 +26,9 @@ namespace FanSync
         {
             foreach (string key in keys)
             {
+                if (!((JObject)obj).ContainsKey(key))
+                    return null;
+                
                 obj = ((JObject)obj).GetValue(key);
             }
             return obj;
