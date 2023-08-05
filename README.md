@@ -25,7 +25,7 @@ session.headers.update({
 cookie = requests.cookies.create_cookie(name='FANBOXSESSID', value=FANBOX_COOKIE)
 session.cookies.set_cookie(cookie)
 
-plans = fanbox.get('https://api.fanbox.cc/plan.listCreator?userId={}'.format(PIXIV_ID))
+plans = session.get('https://api.fanbox.cc/plan.listCreator?userId={}'.format(PIXIV_ID))
 planData = plans.text
 
 supporters = session.get('https://api.fanbox.cc/relationship.listFans?status=supporter')
