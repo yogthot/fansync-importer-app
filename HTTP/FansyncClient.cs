@@ -12,11 +12,11 @@ namespace FanSync.HTTP
 {
     public class FansyncClient
     {
-        private Settings settings;
+        private Settings Settings { get; set; }
 
         public FansyncClient(Settings settings)
         {
-            this.settings = settings;
+            Settings = settings;
         }
 
         public async Task<FansyncStatus> GetStatus()
@@ -28,7 +28,7 @@ namespace FanSync.HTTP
                     HttpRequestMessage fansyncRequest = new HttpRequestMessage()
                     {
                         Method = HttpMethod.Get,
-                        RequestUri = new Uri($"{settings.endpoint}/api/status")
+                        RequestUri = new Uri($"{Settings.endpoint}/api/status")
                     };
 
                     HttpResponseMessage resp = await client.SendAsync(fansyncRequest);
@@ -50,7 +50,7 @@ namespace FanSync.HTTP
                 HttpRequestMessage fansyncRequest = new HttpRequestMessage()
                 {
                     Method = HttpMethod.Post,
-                    RequestUri = new Uri($"{settings.endpoint}/api/creator/{settings.pixiv_id}/plans?token={settings.token}"),
+                    RequestUri = new Uri($"{Settings.endpoint}/api/creator/{Settings.pixiv_id}/plans?token={Settings.token}"),
                     Content = new StringContent(plans)
                 };
 
@@ -69,7 +69,7 @@ namespace FanSync.HTTP
                 HttpRequestMessage fansyncRequest = new HttpRequestMessage()
                 {
                     Method = HttpMethod.Post,
-                    RequestUri = new Uri($"{settings.endpoint}/api/creator/{settings.pixiv_id}/supporters?token={settings.token}"),
+                    RequestUri = new Uri($"{Settings.endpoint}/api/creator/{Settings.pixiv_id}/supporters?token={Settings.token}"),
                     Content = new StringContent(supporters)
                 };
 
@@ -90,7 +90,7 @@ namespace FanSync.HTTP
                 HttpRequestMessage fansyncRequest = new HttpRequestMessage()
                 {
                     Method = HttpMethod.Post,
-                    RequestUri = new Uri($"{settings.endpoint}/api/creator/{settings.pixiv_id}/pledges?month={month}&token={settings.token}"),
+                    RequestUri = new Uri($"{Settings.endpoint}/api/creator/{Settings.pixiv_id}/pledges?month={month}&token={Settings.token}"),
                     Content = new StringContent(pledges)
                 };
 
@@ -110,7 +110,7 @@ namespace FanSync.HTTP
                 HttpRequestMessage fansyncRequest = new HttpRequestMessage()
                 {
                     Method = HttpMethod.Get,
-                    RequestUri = new Uri($"{settings.endpoint}/api/creator/{pixiv_id}/status?token={token}")
+                    RequestUri = new Uri($"{Settings.endpoint}/api/creator/{pixiv_id}/status?token={token}")
                 };
 
                 HttpResponseMessage resp = await client.SendAsync(fansyncRequest);

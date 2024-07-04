@@ -349,7 +349,7 @@ namespace FanSync
                         break;
 
                     case "reset_config":
-                        settings = Settings.DefaultSettings;
+                        settings.Update(Settings.DefaultSettings);
                         await settings.Save();
 
                         if (handleNotificationThenExit == true)

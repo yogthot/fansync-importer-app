@@ -263,10 +263,7 @@ namespace FanSync
         #region advanced tab
         private async void Reset_Click(object sender, RoutedEventArgs e)
         {
-            Settings def = Settings.DefaultSettings;
-            settings.endpoint = def.endpoint;
-            settings.headers = def.headers;
-            settings.cookies = def.cookies;
+            settings.Update(Settings.DefaultSettings);
 
             if (!string.IsNullOrEmpty(settings.session_cookie))
             {
@@ -274,6 +271,30 @@ namespace FanSync
             }
 
             await settings.Save();
+
+            FanboxCookie.Text = settings.session_cookie ?? "";
+            FansyncToken.Text = settings.token ?? "";
+        }
+        private async void Reload_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                settings.Update(await Settings.Load());
+            }
+            catch
+            {
+                MessageBox.Show("Error loading settings (TODO###########)", Res.title_error);
+            }
+
+            if (!string.IsNullOrEmpty(settings.session_cookie))
+            {
+                settings.cookies[Settings.FanboxCookieName] = settings.session_cookie;
+            }
+
+            await settings.Save();
+
+            FanboxCookie.Text = settings.session_cookie ?? "";
+            FansyncToken.Text = settings.token ?? "";
         }
         #endregion
 

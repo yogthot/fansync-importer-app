@@ -93,5 +93,19 @@ namespace FanSync
                 await stream.WriteAsync(content, 0, content.Length);
             }
         }
+
+        public void Update(Settings other)
+        {
+            endpoint = other.endpoint;
+            token = other.token;
+
+            pixiv_id = other.pixiv_id;
+            session_cookie = other.session_cookie;
+
+            cookies = other.cookies;
+            headers = other.headers;
+
+            //last_update_time = other.last_update_time;
+        }
     }
 }

@@ -69,8 +69,10 @@
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
                     </Grid.RowDefinitions>
                     <Button Click="Reset_Click" Content="{x:Static res:Resources.lbl_reset_settings}" Grid.Row="0" Grid.Column="0" Margin="5" Padding="20 2"></Button>
+                    <Button Click="Reload_Click" Content="{x:Static res:Resources.lbl_reload_settings}" Grid.Row="1" Grid.Column="0" Margin="5" Padding="20 2"></Button>
                 </Grid>
             </TabItem>
         </TabControl>

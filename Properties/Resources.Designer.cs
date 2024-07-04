@@ -187,6 +187,15 @@ namespace FanSync.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Reload Settings.
+        /// </summary>
+        public static string lbl_reload_settings {
+            get {
+                return ResourceManager.GetString("lbl_reload_settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Reset.
         /// </summary>
         public static string lbl_reset {

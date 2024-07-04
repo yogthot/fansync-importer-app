@@ -159,6 +159,9 @@
   <data name="lbl_not_available" xml:space="preserve">
     <value>N/A</value>
   </data>
+  <data name="lbl_reload_settings" xml:space="preserve">
+    <value>Reload Settings</value>
+  </data>
   <data name="lbl_reset" xml:space="preserve">
     <value>Reset</value>
   </data>

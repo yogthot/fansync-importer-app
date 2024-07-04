@@ -23,17 +23,17 @@ namespace FanSync.HTTP
 
     public class FanboxClient
     {
-        private Settings settings;
+        private Settings Settings { get; set; }
 
         public FanboxClient(Settings settings)
         {
-            this.settings = settings;
+            Settings = settings;
         }
 
         public async Task<string> GetPlans()
         {
             CookieContainer fanboxCookies = new CookieContainer();
-            foreach (var cookie in settings.cookies)
+            foreach (var cookie in Settings.cookies)
             {
                 fanboxCookies.Add(new Cookie(cookie.Key, cookie.Value) { Domain = "fanbox.cc" });
             }
@@ -45,19 +45,19 @@ namespace FanSync.HTTP
                 {
                     Version = HttpVersion.Version11,
                     Method = HttpMethod.Get,
-                    RequestUri = new Uri($"https://api.fanbox.cc/plan.listCreator?userId={settings.pixiv_id}"),
+                    RequestUri = new Uri($"https://api.fanbox.cc/plan.listCreator?userId={Settings.pixiv_id}"),
                     Headers = { }
                 };
-                foreach (var header in settings.headers)
+                foreach (var header in Settings.headers)
                 {
                     fanboxRequest.Headers.TryAddWithoutValidation(header.Key, header.Value);
                 }
 
-                if (!settings.headers.ContainsKey("Origin"))
+                if (!Settings.headers.ContainsKey("Origin"))
                     fanboxRequest.Headers.Add("Origin", "https://www.fanbox.cc");
-                if (!settings.headers.ContainsKey("Referer"))
+                if (!Settings.headers.ContainsKey("Referer"))
                     fanboxRequest.Headers.Add("Referer", "https://www.fanbox.cc/");
-                if (!settings.headers.ContainsKey("User-Agent"))
+                if (!Settings.headers.ContainsKey("User-Agent"))
                     fanboxRequest.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36");
 
                 HttpResponseMessage resp = await client.SendAsync(fanboxRequest);
@@ -76,7 +76,7 @@ namespace FanSync.HTTP
         public async Task<string> GetSupporters()
         {
             CookieContainer fanboxCookies = new CookieContainer();
-            foreach (var cookie in settings.cookies)
+            foreach (var cookie in Settings.cookies)
             {
                 fanboxCookies.Add(new Cookie(cookie.Key, cookie.Value) { Domain = "fanbox.cc" });
             }
@@ -91,16 +91,16 @@ namespace FanSync.HTTP
                     RequestUri = new Uri($"https://api.fanbox.cc/relationship.listFans?status=supporter"),
                     Headers = { }
                 };
-                foreach (var header in settings.headers)
+                foreach (var header in Settings.headers)
                 {
                     fanboxRequest.Headers.TryAddWithoutValidation(header.Key, header.Value);
                 }
 
-                if (!settings.headers.ContainsKey("Origin"))
+                if (!Settings.headers.ContainsKey("Origin"))
                     fanboxRequest.Headers.Add("Origin", "https://www.fanbox.cc");
-                if (!settings.headers.ContainsKey("Referer"))
+                if (!Settings.headers.ContainsKey("Referer"))
                     fanboxRequest.Headers.Add("Referer", "https://www.fanbox.cc/");
-                if (!settings.headers.ContainsKey("User-Agent"))
+                if (!Settings.headers.ContainsKey("User-Agent"))
                     fanboxRequest.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36");
 
                 HttpResponseMessage resp = await client.SendAsync(fanboxRequest);
@@ -121,7 +121,7 @@ namespace FanSync.HTTP
         public async Task<string> GetPledges(string month)
         {
             CookieContainer fanboxCookies = new CookieContainer();
-            foreach (var cookie in settings.cookies)
+            foreach (var cookie in Settings.cookies)
             {
                 fanboxCookies.Add(new Cookie(cookie.Key, cookie.Value) { Domain = "fanbox.cc" });
             }
@@ -136,16 +136,16 @@ namespace FanSync.HTTP
                     RequestUri = new Uri($"https://api.fanbox.cc/legacy/manage/pledge/monthly?month={month}"),
                     Headers = { }
                 };
-                foreach (var header in settings.headers)
+                foreach (var header in Settings.headers)
                 {
                     fanboxRequest.Headers.TryAddWithoutValidation(header.Key, header.Value);
                 }
 
-                if (!settings.headers.ContainsKey("Origin"))
+                if (!Settings.headers.ContainsKey("Origin"))
                     fanboxRequest.Headers.Add("Origin", "https://www.fanbox.cc");
-                if (!settings.headers.ContainsKey("Referer"))
+                if (!Settings.headers.ContainsKey("Referer"))
                     fanboxRequest.Headers.Add("Referer", "https://www.fanbox.cc/");
-                if (!settings.headers.ContainsKey("User-Agent"))
+                if (!Settings.headers.ContainsKey("User-Agent"))
                     fanboxRequest.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36");
 
                 HttpResponseMessage resp = await client.SendAsync(fanboxRequest);
@@ -169,7 +169,7 @@ namespace FanSync.HTTP
                         RequestUri = new Uri($"https://www.fanbox.cc/manage/dashboard"),
                         Headers = { }
                     };
-                    foreach (var header in settings.headers)
+                    foreach (var header in Settings.headers)
                     {
                         fanboxRequest.Headers.Add(header.Key, header.Value);
                     }
