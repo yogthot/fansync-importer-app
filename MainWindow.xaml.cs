@@ -21,6 +21,21 @@ using Res = FanSync.Properties.Resources;
 
 namespace FanSync
 {
+    class HitTestGuard : IDisposable
+    {
+        Window Owner { get; }
+        public HitTestGuard(Window owner)
+        {
+            Owner = owner;
+            Owner.IsHitTestVisible = false;
+        }
+
+        public void Dispose()
+        {
+            Owner.IsHitTestVisible = true;
+        }
+    }
+
     public partial class MainWindow : Window
     {
         private App app;
@@ -301,14 +316,22 @@ namespace FanSync
         private async void Headers_Click(object sender, RoutedEventArgs e)
         {
             var editor = new KeyValueEditor(this, Res.lbl_headers, settings.headers, new List<string> { "Origin", "Referer", "User-Agent" });
-            settings.headers = await editor.ShowAndWait();
+            using (new HitTestGuard(this))
+                settings.headers = await editor.ShowAndWait();
 
             await settings.Save();
         }
         private async void Cookies_Click(object sender, RoutedEventArgs e)
         {
             var editor = new KeyValueEditor(this, Res.lbl_cookies, settings.cookies, new List<string> { "FANBOXSESSID" });
-            settings.cookies = await editor.ShowAndWait();
+            using (new HitTestGuard(this))
+                settings.cookies = await editor.ShowAndWait();
+
+            if (settings.cookies[Settings.FanboxCookieName] != settings.session_cookie)
+            {
+                settings.session_cookie = settings.cookies[Settings.FanboxCookieName];
+                FanboxCookie.Text = settings.session_cookie ?? "";
+            }
 
             await settings.Save();
         }
