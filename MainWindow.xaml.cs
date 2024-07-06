@@ -1,4 +1,5 @@
 ﻿using FanSync.HTTP;
+using FanSync.Windows;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -283,7 +284,8 @@ namespace FanSync
             }
             catch
             {
-                MessageBox.Show("Error loading settings (TODO###########)", Res.title_error);
+                MessageBox.Show(this, Res.lbl_err_reload, Res.title_error, MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
 
             if (!string.IsNullOrEmpty(settings.session_cookie))
@@ -295,6 +297,20 @@ namespace FanSync
 
             FanboxCookie.Text = settings.session_cookie ?? "";
             FansyncToken.Text = settings.token ?? "";
+        }
+        private async void Headers_Click(object sender, RoutedEventArgs e)
+        {
+            var editor = new KeyValueEditor(this, Res.lbl_headers, settings.headers, new List<string> { "Origin", "Referer", "User-Agent" });
+            settings.headers = await editor.ShowAndWait();
+
+            await settings.Save();
+        }
+        private async void Cookies_Click(object sender, RoutedEventArgs e)
+        {
+            var editor = new KeyValueEditor(this, Res.lbl_cookies, settings.cookies, new List<string> { "FANBOXSESSID" });
+            settings.cookies = await editor.ShowAndWait();
+
+            await settings.Save();
         }
         #endregion
 

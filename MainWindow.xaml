@@ -70,27 +70,35 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
                     </Grid.RowDefinitions>
-                    <Button Click="Reset_Click" Content="{x:Static res:Resources.lbl_reset_settings}" Grid.Row="0" Grid.Column="0" Margin="5" Padding="20 2"></Button>
-                    <Button Click="Reload_Click" Content="{x:Static res:Resources.lbl_reload_settings}" Grid.Row="1" Grid.Column="0" Margin="5" Padding="20 2"></Button>
+                    <Button Click="Reset_Click" Content="{x:Static res:Resources.lbl_reset_settings}" Grid.Row="0" Grid.Column="0" Margin="5" Padding="20 2" HorizontalAlignment="Left"></Button>
+                    <Button Click="Reload_Click" Content="{x:Static res:Resources.lbl_reload_settings}" Grid.Row="1" Grid.Column="0" Margin="5" Padding="20 2" HorizontalAlignment="Left"></Button>
+                    <Grid Grid.Row="2" Grid.Column="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Button Click="Headers_Click" Content="{x:Static res:Resources.lbl_headers_}" Grid.Row="0" Grid.Column="0" Margin="5" Padding="20 2"></Button>
+                        <Button Click="Cookies_Click" Content="{x:Static res:Resources.lbl_cookies_}" Grid.Row="0" Grid.Column="1" Margin="5" Padding="20 2"></Button>
+                    </Grid>
                 </Grid>
             </TabItem>
         </TabControl>
         
         <!-- buttons -->
-        <Grid Grid.Row="1" Grid.Column="0" Grid.IsSharedSizeScope="true">
+        <Grid Grid.Row="1" Grid.Column="0" IsSharedSizeScope="True">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition/>
+                <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" SharedSizeGroup="A"></ColumnDefinition>
                 <ColumnDefinition Width="Auto" SharedSizeGroup="A"></ColumnDefinition>
                 <ColumnDefinition Width="Auto" SharedSizeGroup="A"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <TextBlock Name="VersionStatus" Visibility="Hidden" Text="{x:Static res:Resources.lbl_update_available}" Foreground="Red" TextDecorations="Underline" VerticalAlignment="Center" Cursor="Hand" MouseLeftButtonUp="VersionStatus_Click" Padding="8 2"></TextBlock>
             
-            <Button Click="Ok_Click" Content="{x:Static res:Resources.lbl_confirm}" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5" Padding="20 2"/>
-            <Button Click="Cancel_Click" Content="{x:Static res:Resources.lbl_cancel}" Grid.Column="3" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5" Padding="20 2"/>
-            <Button Name="ApplyButton" Click="Apply_Click" Content="{x:Static res:Resources.lbl_apply}" Grid.Column="4" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5" Padding="20 2" IsEnabled="False"/>
+            <Button Click="Ok_Click" Content="{x:Static res:Resources.lbl_confirm}" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5" Padding="20 2"/>
+            <Button Click="Cancel_Click" Content="{x:Static res:Resources.lbl_cancel}" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5" Padding="20 2"/>
+            <Button Name="ApplyButton" Click="Apply_Click" Content="{x:Static res:Resources.lbl_apply}" Grid.Column="3" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5" Padding="20 2" IsEnabled="False"/>
         </Grid>
 
     </Grid>

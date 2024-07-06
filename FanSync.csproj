@@ -66,6 +66,9 @@
     <Compile Include="Notification.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Util.cs" />
+    <Compile Include="Windows\KeyValueEditor.xaml.cs">
+      <DependentUpon>KeyValueEditor.xaml</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -85,6 +88,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Windows\KeyValueEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

@@ -133,6 +133,33 @@ namespace FanSync.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cookies.
+        /// </summary>
+        public static string lbl_cookies {
+            get {
+                return ResourceManager.GetString("lbl_cookies", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cookies....
+        /// </summary>
+        public static string lbl_cookies_ {
+            get {
+                return ResourceManager.GetString("lbl_cookies_", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error loading settings, please make sure the file contains valid json..
+        /// </summary>
+        public static string lbl_err_reload {
+            get {
+                return ResourceManager.GetString("lbl_err_reload", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Exit.
         /// </summary>
         public static string lbl_exit {
@@ -169,11 +196,38 @@ namespace FanSync.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Headers.
+        /// </summary>
+        public static string lbl_headers {
+            get {
+                return ResourceManager.GetString("lbl_headers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Headers....
+        /// </summary>
+        public static string lbl_headers_ {
+            get {
+                return ResourceManager.GetString("lbl_headers_", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Loading....
         /// </summary>
         public static string lbl_loading {
             get {
                 return ResourceManager.GetString("lbl_loading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name.
+        /// </summary>
+        public static string lbl_name {
+            get {
+                return ResourceManager.GetString("lbl_name", resourceCulture);
             }
         }
         
@@ -282,6 +336,15 @@ namespace FanSync.Properties {
         public static string lbl_updating {
             get {
                 return ResourceManager.GetString("lbl_updating", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value.
+        /// </summary>
+        public static string lbl_value {
+            get {
+                return ResourceManager.GetString("lbl_value", resourceCulture);
             }
         }
         

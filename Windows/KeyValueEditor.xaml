@@ -1,0 +1,61 @@
+﻿<Window x:Class="FanSync.Windows.KeyValueEditor"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:res="clr-namespace:FanSync.Properties"
+        xmlns:local="clr-namespace:FanSync.Windows"
+        mc:Ignorable="d"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        Title="" Height="300" Width="500"
+        Closing="Window_Closing">
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <DataGrid Grid.Row="0" Name="MainGrid" ItemsSource="{Binding Current}" AutoGenerateColumns="False"
+ Margin="5 0" CanUserAddRows="True" IsEnabled="True" HeadersVisibility="Column" PreviewKeyDown="MainGrid_PreviewKeyDown">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="{x:Static res:Resources.lbl_name}" Binding="{Binding Key}" Width="Auto" MinWidth="100" MaxWidth="200" CanUserSort="False" >
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Protected}" Value="True">
+                                    <Setter Property="Foreground" Value="Gray"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                            <Setter Property="Padding" Value="2"></Setter>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                    <DataGridTextColumn.EditingElementStyle>
+                        <Style TargetType="TextBox">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Protected}" Value="True">
+                                    <Setter Property="IsReadOnly" Value="True"/>
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                    <Setter Property="BorderBrush" Value="Transparent"/>
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="Foreground" Value="White"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                            <Setter Property="Padding" Value="2"></Setter>
+                        </Style>
+                    </DataGridTextColumn.EditingElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="{x:Static res:Resources.lbl_value}" Binding="{Binding Value}" Width="*" CanUserSort="False" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Grid Grid.Row="1" IsSharedSizeScope="True">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" SharedSizeGroup="A"></ColumnDefinition>
+                <ColumnDefinition Width="Auto" SharedSizeGroup="A"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Button Click="Ok_Click" Content="{x:Static res:Resources.lbl_confirm}" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5" Padding="20 2"/>
+            <Button Click="Cancel_Click" Content="{x:Static res:Resources.lbl_cancel}" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5" Padding="20 2"/>
+        </Grid>
+    </Grid>
+</Window>

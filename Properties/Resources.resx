@@ -141,6 +141,15 @@
   <data name="lbl_confirm" xml:space="preserve">
     <value>OK</value>
   </data>
+  <data name="lbl_cookies" xml:space="preserve">
+    <value>Cookies</value>
+  </data>
+  <data name="lbl_cookies_" xml:space="preserve">
+    <value>Cookies...</value>
+  </data>
+  <data name="lbl_err_reload" xml:space="preserve">
+    <value>Error loading settings, please make sure the file contains valid json.</value>
+  </data>
   <data name="lbl_exit" xml:space="preserve">
     <value>Exit</value>
   </data>
@@ -153,8 +162,17 @@
   <data name="lbl_force_update" xml:space="preserve">
     <value>Update Supporters</value>
   </data>
+  <data name="lbl_headers" xml:space="preserve">
+    <value>Headers</value>
+  </data>
+  <data name="lbl_headers_" xml:space="preserve">
+    <value>Headers...</value>
+  </data>
   <data name="lbl_loading" xml:space="preserve">
     <value>Loading...</value>
+  </data>
+  <data name="lbl_name" xml:space="preserve">
+    <value>Name</value>
   </data>
   <data name="lbl_not_available" xml:space="preserve">
     <value>N/A</value>
@@ -191,6 +209,9 @@
   </data>
   <data name="lbl_updating" xml:space="preserve">
     <value>Updating...</value>
+  </data>
+  <data name="lbl_value" xml:space="preserve">
+    <value>Value</value>
   </data>
   <data name="msg_out_of_service" xml:space="preserve">
     <value>FanSync has stopped being supported, please uninstall this application.</value>
