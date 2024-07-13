@@ -19,7 +19,7 @@ namespace FanSync.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -120,6 +120,24 @@ namespace FanSync.Properties {
         public static string lbl_cancel {
             get {
                 return ResourceManager.GetString("lbl_cancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to cf__clearance Cookie:.
+        /// </summary>
+        public static string lbl_cf_clearance_cookie {
+            get {
+                return ResourceManager.GetString("lbl_cf_clearance_cookie", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cloudflare Clearance.
+        /// </summary>
+        public static string lbl_cloudflare_clearance {
+            get {
+                return ResourceManager.GetString("lbl_cloudflare_clearance", resourceCulture);
             }
         }
         
@@ -336,6 +354,15 @@ namespace FanSync.Properties {
         public static string lbl_updating {
             get {
                 return ResourceManager.GetString("lbl_updating", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User Agent:.
+        /// </summary>
+        public static string lbl_user_agent {
+            get {
+                return ResourceManager.GetString("lbl_user_agent", resourceCulture);
             }
         }
         

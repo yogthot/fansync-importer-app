@@ -53,10 +53,10 @@
                     <Label Content="{x:Static res:Resources.lbl_fansync_token}" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" />
 
                     <Label Name="FanboxCookieLabel" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="1" Grid.Row="0" Content="{x:Static res:Resources.lbl_unchanged}" FontStyle="Italic" MouseDown="FanboxCookieLabel_MouseDown" />
-                    <TextBox Name="FanboxCookie" TextChanged="Form_Changed" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Text="" VerticalAlignment="Stretch" Grid.Column="1" Grid.Row="0" Margin="0 2" Visibility="Hidden" />
+                    <TextBox Name="FanboxCookie" TextChanged="Form_Changed" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Text="" VerticalAlignment="Stretch" Grid.Column="1" Grid.Row="0" Margin="0 2" Visibility="Hidden" />
 
                     <Label Name="FansyncTokenLabel" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="1" Grid.Row="1" Content="{x:Static res:Resources.lbl_unchanged}" FontStyle="Italic" MouseDown="FansyncTokenLabel_MouseDown" />
-                    <TextBox Name="FansyncToken" TextChanged="Form_Changed" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Text="" VerticalAlignment="Stretch" Grid.Column="1" Grid.Row="1" Margin="0 2" Visibility="Hidden" />
+                    <TextBox Name="FansyncToken" TextChanged="Form_Changed" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Text="" VerticalAlignment="Stretch" Grid.Column="1" Grid.Row="1" Margin="0 2" Visibility="Hidden" />
 
                     <Label Name="ErrorLabel" Visibility="Hidden" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Foreground="Red" VerticalAlignment="Bottom" Padding="5 5 5 0"></Label>
                     <Label Name="LoadingLabel" Content="{x:Static res:Resources.lbl_loading}" Visibility="Hidden" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Bottom" Padding="5 5 5 0"></Label>

@@ -62,10 +62,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Ext\DictionaryExtensions.cs" />
     <Compile Include="HTTP\FansyncStatus.cs" />
     <Compile Include="Notification.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Util.cs" />
+    <Compile Include="Windows\CloudflareClearance.xaml.cs">
+      <DependentUpon>CloudflareClearance.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\KeyValueEditor.xaml.cs">
       <DependentUpon>KeyValueEditor.xaml</DependentUpon>
     </Compile>
@@ -88,6 +92,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Windows\CloudflareClearance.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Windows\KeyValueEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

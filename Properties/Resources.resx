@@ -138,6 +138,12 @@
   <data name="lbl_cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
+  <data name="lbl_cf_clearance_cookie" xml:space="preserve">
+    <value>cf__clearance Cookie:</value>
+  </data>
+  <data name="lbl_cloudflare_clearance" xml:space="preserve">
+    <value>Cloudflare Clearance</value>
+  </data>
   <data name="lbl_confirm" xml:space="preserve">
     <value>OK</value>
   </data>
@@ -209,6 +215,9 @@
   </data>
   <data name="lbl_updating" xml:space="preserve">
     <value>Updating...</value>
+  </data>
+  <data name="lbl_user_agent" xml:space="preserve">
+    <value>User Agent:</value>
   </data>
   <data name="lbl_value" xml:space="preserve">
     <value>Value</value>

@@ -1,4 +1,5 @@
 ﻿using FanSync.HTTP;
+using FanSync.Properties;
 using FanSync.Windows;
 using System;
 using System.Collections.Generic;
