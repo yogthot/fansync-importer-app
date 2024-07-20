@@ -73,12 +73,16 @@ namespace FanSync
 
             if (settings.show_cloudflare)
             {
+                UserAgentLabel.Visibility = Visibility.Visible;
                 UserAgent.Visibility = Visibility.Visible;
+                CfClearanceLabel.Visibility = Visibility.Visible;
                 CfClearance.Visibility = Visibility.Visible;
             }
             else
             {
+                UserAgentLabel.Visibility = Visibility.Hidden;
                 UserAgent.Visibility = Visibility.Hidden;
+                CfClearanceLabel.Visibility = Visibility.Hidden;
                 CfClearance.Visibility = Visibility.Hidden;
             }
 
@@ -150,7 +154,9 @@ namespace FanSync
                         LastStatus.Content = Res.err_cloudflare_detected;
 
                         settings.show_cloudflare = true;
+                        UserAgentLabel.Visibility = Visibility.Visible;
                         UserAgent.Visibility = Visibility.Visible;
+                        CfClearanceLabel.Visibility = Visibility.Visible;
                         CfClearance.Visibility = Visibility.Visible;
                         _ = settings.Save();
                         return;
@@ -263,8 +269,8 @@ namespace FanSync
 
                 test.session_cookie = cookie;
                 test.cookies[Settings.FanboxCookie] = cookie;
-                test.cookies[Settings.CfClearanceCookie] = origCfClearance;
-                test.headers[Settings.UserAgentHeader] = origUserAgent;
+                test.cookies.SetOrRemove(Settings.CfClearanceCookie, cfCookie);
+                test.headers[Settings.UserAgentHeader] = uaHeader;
 
                 FanboxClient fanbox = new FanboxClient(test);
                 Tuple<FanboxStatus, string> cookieStatus = await fanbox.TestCookie();
@@ -281,7 +287,9 @@ namespace FanSync
                         DisplayError(Res.err_cloudflare_detected);
 
                         settings.show_cloudflare = true;
+                        UserAgentLabel.Visibility = Visibility.Visible;
                         UserAgent.Visibility = Visibility.Visible;
+                        CfClearanceLabel.Visibility = Visibility.Visible;
                         CfClearance.Visibility = Visibility.Visible;
                         await settings.Save();
 

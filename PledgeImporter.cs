@@ -182,7 +182,7 @@ namespace FanSync
 
                 DateTimeOffset now = DateTimeOffset.Now;
                 settings.last_update_time = now;
-                OnStatus?.Invoke(this, new ImporterStatus(now, planData.Item1, fansyncError, !networkError));
+                OnStatus?.Invoke(this, new ImporterStatus(now, planData.Item1, !fansyncError, !networkError));
                 
                 if (!await Wait())
                     return;

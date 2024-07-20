@@ -191,7 +191,6 @@ namespace FanSync.HTTP
                 fanboxCookies.Add(new Cookie(cookie.Key, cookie.Value) { Domain = Domain });
             }
 
-            // TODO detect cloudflare
             try
             {
                 using (HttpClientHandler handler = new HttpClientHandler() {

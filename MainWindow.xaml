@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:res="clr-namespace:FanSync.Properties"
         mc:Ignorable="d"
-        Title="{x:Static res:Resources.title_main}" MinHeight="230" MinWidth="400"
+        Title="{x:Static res:Resources.title_main}" MinHeight="240" MinWidth="400"
         SizeToContent="Height" Width="500"
         Activated="Window_Activated">
     <Grid>
@@ -61,10 +61,10 @@
                     <TextBox Name="FansyncToken" TextChanged="Form_Changed" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Text="" VerticalAlignment="Stretch" Grid.Column="1" Grid.Row="1" Margin="0 2" Visibility="Hidden" />
 
                     <Label Name="UserAgentLabel" Grid.Row="2" Grid.Column="0" Content="{x:Static res:Resources.lbl_user_agent}" HorizontalAlignment="Right"></Label>
-                    <TextBox Name="UserAgent" Grid.Row="2" Grid.Column="1" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" TextWrapping="NoWrap" Margin="0 2" Text="{Binding UserAgent}"></TextBox>
+                    <TextBox Name="UserAgent" TextChanged="Form_Changed" Grid.Row="2" Grid.Column="1" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" TextWrapping="NoWrap" Margin="0 2"></TextBox>
 
                     <Label Name="CfClearanceLabel" Grid.Row="3" Grid.Column="0" Content="{x:Static res:Resources.lbl_cf_clearance_cookie}" HorizontalAlignment="Right"></Label>
-                    <TextBox Name="CfClearance" Grid.Row="3" Grid.Column="1" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" TextWrapping="NoWrap" Margin="0 2" Text="{Binding CfClearance}"></TextBox>
+                    <TextBox Name="CfClearance" TextChanged="Form_Changed" Grid.Row="3" Grid.Column="1" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" TextWrapping="NoWrap" Margin="0 2"></TextBox>
 
                     <Label Name="ErrorLabel" Visibility="Hidden" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Foreground="Red" VerticalAlignment="Bottom" Padding="5 5 5 0"></Label>
                     <Label Name="LoadingLabel" Content="{x:Static res:Resources.lbl_loading}" Visibility="Hidden" d:Visibility="Visible" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Bottom" Padding="5 5 5 0"></Label>

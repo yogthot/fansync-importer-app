@@ -61,7 +61,7 @@ namespace FanSync.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cloudflare protection detected. Please configure the required fields to fix this..
+        ///   Looks up a localized string similar to Cloudflare protection detected. Please update the settings..
         /// </summary>
         public static string err_cloudflare_detected {
             get {
@@ -133,7 +133,7 @@ namespace FanSync.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to cf__clearance Cookie:.
+        ///   Looks up a localized string similar to cf__clearance cookie:.
         /// </summary>
         public static string lbl_cf_clearance_cookie {
             get {
