@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:res="clr-namespace:FanSync.Properties"
         mc:Ignorable="d"
-        Title="{x:Static res:Resources.title_main}" MinHeight="200" MinWidth="400"
+        Title="{x:Static res:Resources.title_main}" MinHeight="230" MinWidth="400"
         SizeToContent="Height" Width="500"
         Activated="Window_Activated">
     <Grid>
@@ -47,19 +47,27 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition></RowDefinition>
                     </Grid.RowDefinitions>
-                    <Label Content="{x:Static res:Resources.lbl_fanbox_cookie}" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right" />
-                    <Label Content="{x:Static res:Resources.lbl_fansync_token}" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" />
 
+                    <Label Content="{x:Static res:Resources.lbl_fanbox_cookie}" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right" />
                     <Label Name="FanboxCookieLabel" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="1" Grid.Row="0" Content="{x:Static res:Resources.lbl_unchanged}" FontStyle="Italic" MouseDown="FanboxCookieLabel_MouseDown" />
                     <TextBox Name="FanboxCookie" TextChanged="Form_Changed" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Text="" VerticalAlignment="Stretch" Grid.Column="1" Grid.Row="0" Margin="0 2" Visibility="Hidden" />
 
+                    <Label Content="{x:Static res:Resources.lbl_fansync_token}" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" />
                     <Label Name="FansyncTokenLabel" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="1" Grid.Row="1" Content="{x:Static res:Resources.lbl_unchanged}" FontStyle="Italic" MouseDown="FansyncTokenLabel_MouseDown" />
                     <TextBox Name="FansyncToken" TextChanged="Form_Changed" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Text="" VerticalAlignment="Stretch" Grid.Column="1" Grid.Row="1" Margin="0 2" Visibility="Hidden" />
 
-                    <Label Name="ErrorLabel" Visibility="Hidden" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Foreground="Red" VerticalAlignment="Bottom" Padding="5 5 5 0"></Label>
-                    <Label Name="LoadingLabel" Content="{x:Static res:Resources.lbl_loading}" Visibility="Hidden" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Bottom" Padding="5 5 5 0"></Label>
+                    <Label Name="UserAgentLabel" Grid.Row="2" Grid.Column="0" Content="{x:Static res:Resources.lbl_user_agent}" HorizontalAlignment="Right"></Label>
+                    <TextBox Name="UserAgent" Grid.Row="2" Grid.Column="1" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" TextWrapping="NoWrap" Margin="0 2" Text="{Binding UserAgent}"></TextBox>
+
+                    <Label Name="CfClearanceLabel" Grid.Row="3" Grid.Column="0" Content="{x:Static res:Resources.lbl_cf_clearance_cookie}" HorizontalAlignment="Right"></Label>
+                    <TextBox Name="CfClearance" Grid.Row="3" Grid.Column="1" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" TextWrapping="NoWrap" Margin="0 2" Text="{Binding CfClearance}"></TextBox>
+
+                    <Label Name="ErrorLabel" Visibility="Hidden" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Foreground="Red" VerticalAlignment="Bottom" Padding="5 5 5 0"></Label>
+                    <Label Name="LoadingLabel" Content="{x:Static res:Resources.lbl_loading}" Visibility="Hidden" d:Visibility="Visible" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Bottom" Padding="5 5 5 0"></Label>
                 </Grid>
             </TabItem>
             <TabItem Header="{x:Static res:Resources.tab_advanced}">

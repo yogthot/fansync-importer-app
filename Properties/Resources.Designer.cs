@@ -61,6 +61,15 @@ namespace FanSync.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cloudflare protection detected. Please configure the required fields to fix this..
+        /// </summary>
+        public static string err_cloudflare_detected {
+            get {
+                return ResourceManager.GetString("err_cloudflare_detected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to FANBOXSESSID cookie is invalid..
         /// </summary>
         public static string err_fanbox_cookie {

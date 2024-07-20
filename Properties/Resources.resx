@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="err_cloudflare_detected" xml:space="preserve">
+    <value>Cloudflare protection detected. Please configure the required fields to fix this.</value>
+  </data>
   <data name="err_fanbox_cookie" xml:space="preserve">
     <value>FANBOXSESSID cookie is invalid.</value>
   </data>

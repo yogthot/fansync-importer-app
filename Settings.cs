@@ -14,20 +14,25 @@ namespace FanSync
         public static string ConfigFileName = "fansync.json";
         public static string ConfigPath => $"{AppDomain.CurrentDomain.BaseDirectory}/{ConfigFileName}";
 
-        public static string FanboxCookieName = "FANBOXSESSID";
+        public const string FanboxCookie  = "FANBOXSESSID";
+        public const string CfClearanceCookie = "cf_clearance";
+
+        public const string UserAgentHeader   = "User-Agent";
+        public const string OriginHeader = "Origin";
+        public const string RefererHeader = "Referer";
 
         public static Settings DefaultSettings => new Settings()
         {
             endpoint = "https://fansync.moe",
             headers = new Dictionary<string, string>()
                     {
-                        { "Origin", "https://www.fanbox.cc" },
-                        { "Referer", "https://www.fanbox.cc/" },
-                        { "User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36" },
+                        { OriginHeader, "https://www.fanbox.cc" },
+                        { RefererHeader, "https://www.fanbox.cc/" },
+                        { UserAgentHeader, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36" },
                     }
         };
 
-        [JsonProperty(DefaultValueHandling=DefaultValueHandling.Include)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Include)]
         public string endpoint { get; set; }
 
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Include)]
@@ -48,6 +53,8 @@ namespace FanSync
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Include)]
         public DateTimeOffset? last_update_time { get; set; }
 
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Include)]
+        public bool show_cloudflare { get; set; }
 
         public Settings()
         {
@@ -106,6 +113,27 @@ namespace FanSync
             headers = other.headers;
 
             //last_update_time = other.last_update_time;
+
+            show_cloudflare = other.show_cloudflare;
+        }
+
+        public Settings Clone()
+        {
+            return new Settings
+            {
+                endpoint = this.endpoint,
+                token = this.token,
+
+                pixiv_id = this.pixiv_id,
+                session_cookie = this.session_cookie,
+
+                cookies = this.cookies.ToDictionary(x => x.Key, x => x.Value),
+                headers = this.headers.ToDictionary(x => x.Key, x => x.Value),
+
+                last_update_time = this.last_update_time,
+
+                show_cloudflare = this.show_cloudflare,
+            };
         }
     }
 }

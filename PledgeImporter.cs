@@ -128,21 +128,24 @@ namespace FanSync
             if (!await Wait(true))
                 return;
 
-            int consecutiveFanboxErrors = 0;
-            int consecutiveFansyncErrors = 0;
             bool networkError = false;
 
             while (true)
             {
+                networkError = false;
+
+                //string month = DateTimeOffset.Now.ToString("yyyy-MM");
+                Tuple<FanboxStatus, string> planData = new Tuple<FanboxStatus, string>(FanboxStatus.Unknown, null);
+                Tuple<FanboxStatus, string> supporterData;
+                bool fansyncError = false;
                 try
                 {
-                    //string month = DateTimeOffset.Now.ToString("yyyy-MM");
-
-                    string planData;
-                    string supporterData;
                     try
                     {
                         planData = await fanbox.GetPlans();
+                        if (planData.Item1 != FanboxStatus.LoggedIn)
+                            throw new Exception($"FanboxStatus: {planData.Item1}");
+
                         supporterData = await fanbox.GetSupporters();
                     }
                     catch (HttpRequestException)
@@ -150,17 +153,11 @@ namespace FanSync
                         networkError = true;
                         throw;
                     }
-                    catch (Exception)
-                    {
-                        consecutiveFanboxErrors++;
-                        throw;
-                    }
-                    consecutiveFanboxErrors = 0;
 
                     try
                     {
-                        await fansync.SubmitPlans(planData);
-                        await fansync.SubmitSupporters(supporterData);
+                        await fansync.SubmitPlans(planData.Item2);
+                        await fansync.SubmitSupporters(supporterData.Item2);
                     }
                     catch (HttpRequestException)
                     {
@@ -169,10 +166,9 @@ namespace FanSync
                     }
                     catch (Exception)
                     {
-                        consecutiveFansyncErrors++;
+                        fansyncError = true;
                         throw;
                     }
-                    consecutiveFansyncErrors = 0;
                 }
                 catch (FanboxAPIError e)
                 {
@@ -184,18 +180,9 @@ namespace FanSync
                     logger.Error(e.ToString());
                 }
 
-                if (consecutiveFanboxErrors > 0 && consecutiveFanboxErrors % 3 == 0)
-                {
-                    Notification.Show(Res.title_error, Res.exc_fanbox_cookie, Notification.Action("settings"));
-                }
-                if (consecutiveFansyncErrors > 0 && consecutiveFansyncErrors % 3 == 0)
-                {
-                    Notification.Show(Res.title_error, Res.exc_fansync_token, Notification.Action("settings"));
-                }
-
                 DateTimeOffset now = DateTimeOffset.Now;
                 settings.last_update_time = now;
-                OnStatus?.Invoke(this, new ImporterStatus(now, consecutiveFanboxErrors == 0, consecutiveFansyncErrors == 0, !networkError));
+                OnStatus?.Invoke(this, new ImporterStatus(now, planData.Item1, fansyncError, !networkError));
                 
                 if (!await Wait())
                     return;
@@ -205,16 +192,16 @@ namespace FanSync
 
     public class ImporterStatus : EventArgs
     {
-        public DateTimeOffset Timestamp { get; private set; }
-        public bool FanboxStatus { get; private set; }
-        public bool FansyncStatus { get; private set; }
-        public bool NetworkStatus { get; private set; }
+        public DateTimeOffset Timestamp { get; }
+        public FanboxStatus FanboxStatus { get; }
+        public bool FansyncStatus { get; }
+        public bool NetworkStatus { get; }
 
-        public ImporterStatus(DateTimeOffset timestamp, bool fanboxStatus, bool fansyncStatus, bool networkStatus)
+        public ImporterStatus(DateTimeOffset timestamp, FanboxStatus fanboxStatus, bool fansyncStatus, bool networkStatus)
         {
             Timestamp = timestamp;
             FanboxStatus = fanboxStatus;
-            FansyncStatus = fanboxStatus;
+            FansyncStatus = fansyncStatus;
             NetworkStatus = networkStatus;
         }
     }

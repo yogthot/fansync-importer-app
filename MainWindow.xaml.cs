@@ -1,4 +1,5 @@
-﻿using FanSync.HTTP;
+﻿using FanSync.Ext;
+using FanSync.HTTP;
 using FanSync.Properties;
 using FanSync.Windows;
 using System;
@@ -67,6 +68,20 @@ namespace FanSync
                 FansyncToken.Text = settings.token;
             }
 
+            UserAgent.Text = settings.headers.GetDefault(Settings.UserAgentHeader, "");
+            CfClearance.Text = settings.cookies.GetDefault(Settings.CfClearanceCookie, "");
+
+            if (settings.show_cloudflare)
+            {
+                UserAgent.Visibility = Visibility.Visible;
+                CfClearance.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                UserAgent.Visibility = Visibility.Hidden;
+                CfClearance.Visibility = Visibility.Hidden;
+            }
+
             ToggleFanboxCookieInput(false);
             ToggleFansyncTokenInput(false);
 
@@ -111,26 +126,52 @@ namespace FanSync
             Process.Start(app.updateUrl);
         }
 
+        //DateTime LastErrorNotification { get; set; }
+        public void NotifyError(string title, string message, Dictionary<string, string> action)
+        {
+            // TODO have some timer, only show an error every ~2.5 hours
+            Notification.Show(title, message, action);
+        }
         public void Importer_Status(object sender, ImporterStatus e)
         {
             Dispatcher.BeginInvoke(new Action(() =>
             {
                 LastUpdate.Content = e.Timestamp.DateTime.ToString();
-                if (!e.FanboxStatus)
+                switch (e.FanboxStatus)
                 {
-                    LastStatus.Content = Res.lbl_status_fanbox_error;
+                    case FanboxStatus.Unknown:
+                    case FanboxStatus.NotLoggedIn:
+                        NotifyError(Res.title_error, Res.exc_fanbox_cookie, Notification.Action("settings"));
+                        LastStatus.Content = Res.lbl_status_fanbox_error;
+                        return;
+
+                    case FanboxStatus.Cloudflare:
+                        NotifyError(Res.title_error, Res.err_cloudflare_detected, Notification.Action("settings"));
+                        LastStatus.Content = Res.err_cloudflare_detected;
+
+                        settings.show_cloudflare = true;
+                        UserAgent.Visibility = Visibility.Visible;
+                        CfClearance.Visibility = Visibility.Visible;
+                        _ = settings.Save();
+                        return;
+
                 }
-                else if (!e.FansyncStatus)
+                
+                if (!e.FansyncStatus)
                 {
                     LastStatus.Content = Res.lbl_status_fansync_error;
+                    NotifyError(Res.title_error, Res.exc_fansync_token, Notification.Action("settings"));
+                    return;
                 }
                 else if (!e.NetworkStatus)
                 {
                     LastStatus.Content = Res.lbl_status_network_error;
+                    return;
                 }
                 else
                 {
                     LastStatus.Content = Res.lbl_status_success;
+                    return;
                 }
             }));
         }
@@ -187,10 +228,15 @@ namespace FanSync
 
         private void Form_Changed(object sender, TextChangedEventArgs e)
         {
+            string origUserAgent = settings.headers.GetDefault(Settings.UserAgentHeader, "");
+            string origCfClearance = settings.cookies.GetDefault(Settings.CfClearanceCookie, "");
+
             // apply only enabled when values are changed
             ApplyButton.IsEnabled =
                     !FanboxCookie.Text.IsSimilar(settings.session_cookie) ||
-                    !FansyncToken.Text.IsSimilar(settings.token);
+                    !FansyncToken.Text.IsSimilar(settings.token) ||
+                    !UserAgent.Text.IsSimilar(origUserAgent) ||
+                    !CfClearance.Text.IsSimilar(origCfClearance);
 
             if (sender == FanboxCookie && clearClipboard)
             {
@@ -202,27 +248,52 @@ namespace FanSync
 
         private async Task<bool> SaveSettings()
         {
+            string origUserAgent = settings.headers.GetDefault(Settings.UserAgentHeader, "");
+            string origCfClearance = settings.cookies.GetDefault(Settings.CfClearanceCookie, "");
+
             bool error = false;
             bool save = false;
 
             string cookie = FanboxCookie.Text.Trim();
-            if (cookie != settings.session_cookie)
+            string cfCookie = CfClearance.Text.Trim();
+            string uaHeader = UserAgent.Text.Trim();
+            if (cookie != settings.session_cookie || cfCookie != origCfClearance || uaHeader != origUserAgent)
             {
-                FanboxClient fanbox = new FanboxClient(settings);
-                string pixiv_id = await fanbox.TestCookie(cookie);
+                Settings test = settings.Clone();
 
-                if (pixiv_id != null)
-                {
-                    settings.pixiv_id = pixiv_id;
-                    settings.session_cookie = cookie;
-                    settings.cookies[Settings.FanboxCookieName] = cookie;
+                test.session_cookie = cookie;
+                test.cookies[Settings.FanboxCookie] = cookie;
+                test.cookies[Settings.CfClearanceCookie] = origCfClearance;
+                test.headers[Settings.UserAgentHeader] = origUserAgent;
 
-                    save = true;
-                }
-                else
+                FanboxClient fanbox = new FanboxClient(test);
+                Tuple<FanboxStatus, string> cookieStatus = await fanbox.TestCookie();
+
+                switch (cookieStatus.Item1)
                 {
-                    DisplayError(Res.err_fanbox_cookie);
-                    error = true;
+                    case FanboxStatus.LoggedIn:
+                        test.pixiv_id = cookieStatus.Item2;
+                        settings.Update(test);
+                        save = true;
+                        break;
+
+                    case FanboxStatus.Cloudflare:
+                        DisplayError(Res.err_cloudflare_detected);
+
+                        settings.show_cloudflare = true;
+                        UserAgent.Visibility = Visibility.Visible;
+                        CfClearance.Visibility = Visibility.Visible;
+                        await settings.Save();
+
+                        error = true;
+                        break;
+
+                    case FanboxStatus.Unknown:
+                    case FanboxStatus.NotLoggedIn:
+                        DisplayError(Res.err_fanbox_cookie);
+                        error = true;
+                        break;
+
                 }
             }
 
@@ -284,13 +355,16 @@ namespace FanSync
 
             if (!string.IsNullOrEmpty(settings.session_cookie))
             {
-                settings.cookies[Settings.FanboxCookieName] = settings.session_cookie;
+                settings.cookies[Settings.FanboxCookie] = settings.session_cookie;
             }
 
             await settings.Save();
 
             FanboxCookie.Text = settings.session_cookie ?? "";
             FansyncToken.Text = settings.token ?? "";
+
+            UserAgent.Text = settings.headers.GetDefault(Settings.UserAgentHeader, "");
+            CfClearance.Text = settings.cookies.GetDefault(Settings.CfClearanceCookie, "");
         }
         private async void Reload_Click(object sender, RoutedEventArgs e)
         {
@@ -306,33 +380,50 @@ namespace FanSync
 
             if (!string.IsNullOrEmpty(settings.session_cookie))
             {
-                settings.cookies[Settings.FanboxCookieName] = settings.session_cookie;
+                settings.cookies[Settings.FanboxCookie] = settings.session_cookie;
             }
 
             await settings.Save();
 
             FanboxCookie.Text = settings.session_cookie ?? "";
             FansyncToken.Text = settings.token ?? "";
+
+            UserAgent.Text = settings.headers.GetDefault(Settings.UserAgentHeader, "");
+            CfClearance.Text = settings.cookies.GetDefault(Settings.CfClearanceCookie, "");
         }
         private async void Headers_Click(object sender, RoutedEventArgs e)
         {
-            var editor = new KeyValueEditor(this, Res.lbl_headers, settings.headers, new List<string> { "Origin", "Referer", "User-Agent" });
+            var readOnlyHeaders = new List<string>
+            {
+                Settings.UserAgentHeader,
+                Settings.OriginHeader,
+                Settings.RefererHeader,
+            };
+            var editor = new KeyValueEditor(this, Res.lbl_headers, settings.headers, readOnlyHeaders);
             using (new HitTestGuard(this))
                 settings.headers = await editor.ShowAndWait();
+
+            UserAgent.Text = settings.headers.GetDefault(Settings.UserAgentHeader, "");
 
             await settings.Save();
         }
         private async void Cookies_Click(object sender, RoutedEventArgs e)
         {
-            var editor = new KeyValueEditor(this, Res.lbl_cookies, settings.cookies, new List<string> { "FANBOXSESSID" });
+            var readOnlyCookies = new List<string>
+            {
+                Settings.FanboxCookie,
+            };
+            var editor = new KeyValueEditor(this, Res.lbl_cookies, settings.cookies, readOnlyCookies);
             using (new HitTestGuard(this))
                 settings.cookies = await editor.ShowAndWait();
 
-            if (settings.cookies[Settings.FanboxCookieName] != settings.session_cookie)
+            if (settings.cookies[Settings.FanboxCookie] != settings.session_cookie)
             {
-                settings.session_cookie = settings.cookies[Settings.FanboxCookieName];
+                settings.session_cookie = settings.cookies[Settings.FanboxCookie];
                 FanboxCookie.Text = settings.session_cookie ?? "";
             }
+
+            CfClearance.Text = settings.cookies.GetDefault(Settings.CfClearanceCookie, "");
 
             await settings.Save();
         }
