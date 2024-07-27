@@ -12,17 +12,6 @@ using static FanSync.HTTP.FanboxClient;
 
 namespace FanSync.HTTP
 {
-    public class FanboxAPIError : Exception
-    {
-        public string Content;
-
-        public FanboxAPIError(string message, string content)
-            : base(message)
-        {
-            Content = content;
-        }
-    }
-
     public enum FanboxStatus
     {
         Unknown,
@@ -88,7 +77,6 @@ namespace FanSync.HTTP
                 string error = Util.NavigateJson(json, "error")?.ToObject<string>();
                 if (error != null)
                 {
-                    //throw new FanboxAPIError(error, content);
                     return Tuple.Create(FanboxStatus.NotLoggedIn, content);
                 }
 
@@ -139,7 +127,6 @@ namespace FanSync.HTTP
                 string error = Util.NavigateJson(json, "error")?.ToObject<string>();
                 if (error != null)
                 {
-                    //throw new FanboxAPIError(error, content);
                     return Tuple.Create(FanboxStatus.NotLoggedIn, content);
                 }
 
@@ -242,7 +229,6 @@ namespace FanSync.HTTP
             }
             catch (Exception)
             {
-                // TODO log (in case it keeps happening)
                 return Tuple.Create(FanboxStatus.Unknown, "");
             }
         }

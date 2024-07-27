@@ -34,7 +34,7 @@ namespace FanSync
 
         public bool IsRunning { get; private set; }
 
-        public event Action<object, ImporterStatus> OnStatus;
+        public event Action<object, ImporterResult> OnStatus;
 
         public PledgeImporter(Settings settings)
         {
@@ -128,29 +128,48 @@ namespace FanSync
             if (!await Wait(true))
                 return;
 
-            bool networkError = false;
-
             while (true)
             {
-                networkError = false;
-
                 //string month = DateTimeOffset.Now.ToString("yyyy-MM");
                 Tuple<FanboxStatus, string> planData = new Tuple<FanboxStatus, string>(FanboxStatus.Unknown, null);
                 Tuple<FanboxStatus, string> supporterData;
-                bool fansyncError = false;
+                ImporterStatus status = ImporterStatus.Success;
                 try
                 {
                     try
                     {
                         planData = await fanbox.GetPlans();
                         if (planData.Item1 != FanboxStatus.LoggedIn)
+                        {
+                            switch (planData.Item1)
+                            {
+                                case FanboxStatus.Unknown:
+                                case FanboxStatus.NotLoggedIn:
+                                    status = Upgrade(status, ImporterStatus.FanboxCookieError);
+                                    break;
+
+                                case FanboxStatus.Cloudflare:
+                                    status = Upgrade(status, ImporterStatus.FanboxCloudflareError);
+                                    break;
+                            }
+
+                            if (!string.IsNullOrEmpty(planData.Item2))
+                                logger.Error(planData.Item2);
+
                             throw new Exception($"FanboxStatus: {planData.Item1}");
+                        }
 
                         supporterData = await fanbox.GetSupporters();
                     }
                     catch (HttpRequestException)
                     {
-                        networkError = true;
+                        status = Upgrade(status, ImporterStatus.NetworkError);
+                        throw;
+                    }
+                    catch (Exception e)
+                    {
+                        // is it a cookie error???
+                        status = Upgrade(status, ImporterStatus.FanboxCookieError);
                         throw;
                     }
 
@@ -161,48 +180,61 @@ namespace FanSync
                     }
                     catch (HttpRequestException)
                     {
-                        networkError = true;
+                        status = Upgrade(status, ImporterStatus.NetworkError);
                         throw;
                     }
                     catch (Exception)
                     {
-                        fansyncError = true;
+                        status = Upgrade(status, ImporterStatus.FansyncError);
                         throw;
                     }
                 }
-                catch (FanboxAPIError e)
+                catch (HttpRequestException)
                 {
-                    logger.Error(e.Content);
-                    logger.Error(e.ToString());
+                    status = Upgrade(status, ImporterStatus.NetworkError);
                 }
                 catch (Exception e)
                 {
+                    status = Upgrade(status, ImporterStatus.UnknownError);
                     logger.Error(e.ToString());
                 }
 
                 DateTimeOffset now = DateTimeOffset.Now;
                 settings.last_update_time = now;
-                OnStatus?.Invoke(this, new ImporterStatus(now, planData.Item1, !fansyncError, !networkError));
+                OnStatus?.Invoke(this, new ImporterResult(now, status));
                 
                 if (!await Wait())
                     return;
             }
         }
+
+        public ImporterStatus Upgrade(ImporterStatus val, ImporterStatus newval)
+        {
+            return (int)val >= (int)newval ? val : newval;
+        }
     }
 
-    public class ImporterStatus : EventArgs
+    public enum ImporterStatus
+    {
+        Success,
+
+        // errors go in reverse order of priority
+        UnknownError,
+        NetworkError,
+        FansyncError,
+        FanboxCloudflareError,
+        FanboxCookieError,
+    }
+    
+    public class ImporterResult : EventArgs
     {
         public DateTimeOffset Timestamp { get; }
-        public FanboxStatus FanboxStatus { get; }
-        public bool FansyncStatus { get; }
-        public bool NetworkStatus { get; }
+        public ImporterStatus Status { get; }
 
-        public ImporterStatus(DateTimeOffset timestamp, FanboxStatus fanboxStatus, bool fansyncStatus, bool networkStatus)
+        public ImporterResult(DateTimeOffset timestamp, ImporterStatus importerStatus)
         {
             Timestamp = timestamp;
-            FanboxStatus = fanboxStatus;
-            FansyncStatus = fansyncStatus;
-            NetworkStatus = networkStatus;
+            Status = importerStatus;
         }
     }
 }

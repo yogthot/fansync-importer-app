@@ -136,48 +136,43 @@ namespace FanSync
             // TODO have some timer, only show an error every ~2.5 hours
             Notification.Show(title, message, action);
         }
-        public void Importer_Status(object sender, ImporterStatus e)
+        public void Importer_Status(object sender, ImporterResult e)
         {
             Dispatcher.BeginInvoke(new Action(() =>
             {
                 LastUpdate.Content = e.Timestamp.DateTime.ToString();
-                switch (e.FanboxStatus)
+                switch (e.Status)
                 {
-                    case FanboxStatus.Unknown:
-                    case FanboxStatus.NotLoggedIn:
+                    case ImporterStatus.FanboxCookieError:
                         NotifyError(Res.title_error, Res.exc_fanbox_cookie, Notification.Action("settings"));
                         LastStatus.Content = Res.lbl_status_fanbox_error;
-                        return;
+                        break;
 
-                    case FanboxStatus.Cloudflare:
+                    case ImporterStatus.FanboxCloudflareError:
                         NotifyError(Res.title_error, Res.err_cloudflare_detected, Notification.Action("settings"));
                         LastStatus.Content = Res.err_cloudflare_detected;
 
                         settings.show_cloudflare = true;
+                        _ = settings.Save();
+
                         UserAgentLabel.Visibility = Visibility.Visible;
                         UserAgent.Visibility = Visibility.Visible;
                         CfClearanceLabel.Visibility = Visibility.Visible;
                         CfClearance.Visibility = Visibility.Visible;
-                        _ = settings.Save();
-                        return;
+                        break;
 
-                }
-                
-                if (!e.FansyncStatus)
-                {
-                    LastStatus.Content = Res.lbl_status_fansync_error;
-                    NotifyError(Res.title_error, Res.exc_fansync_token, Notification.Action("settings"));
-                    return;
-                }
-                else if (!e.NetworkStatus)
-                {
-                    LastStatus.Content = Res.lbl_status_network_error;
-                    return;
-                }
-                else
-                {
-                    LastStatus.Content = Res.lbl_status_success;
-                    return;
+                    case ImporterStatus.FansyncError:
+                        LastStatus.Content = Res.lbl_status_fansync_error;
+                        NotifyError(Res.title_error, Res.exc_fansync_token, Notification.Action("settings"));
+                        break;
+
+                    case ImporterStatus.NetworkError:
+                        LastStatus.Content = Res.lbl_status_network_error;
+                        break;
+
+                    case ImporterStatus.Success:
+                        LastStatus.Content = Res.lbl_status_success;
+                        break;
                 }
             }));
         }
