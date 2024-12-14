@@ -420,7 +420,8 @@ namespace FanSync
             using (new HitTestGuard(this))
                 settings.cookies = await editor.ShowAndWait();
 
-            if (settings.cookies[Settings.FanboxCookie] != settings.session_cookie)
+            var newCookie = settings.cookies.GetDefault(Settings.FanboxCookie, null);
+            if (!string.IsNullOrEmpty(newCookie) && newCookie != settings.session_cookie)
             {
                 settings.session_cookie = settings.cookies[Settings.FanboxCookie];
                 FanboxCookie.Text = settings.session_cookie ?? "";
