@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [2.1.1.0] - 2024-12-14
+
+### Fixed
+
+- Crash when opening the cookies editor before doing the initial setup.
+
+
 ## [2.1.0.0] - 2024-07-20
 
 ### Added
