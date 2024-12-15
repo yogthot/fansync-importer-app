@@ -25,6 +25,7 @@ namespace FanSync.Logging
         private string filename;
 
         private FileStream currentStream;
+        private StreamWriter currentWriter;
 
         public Logger(string basePath, string filename)
         {
@@ -32,20 +33,23 @@ namespace FanSync.Logging
             this.filename = filename;
         }
 
-        private DateTime ParseDate(string text)
+        private DateTimeOffset ParseDate(string text)
         {
-            if (DateTime.TryParseExact(text, dateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime result))
+            if (DateTimeOffset.TryParseExact(text, dateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTimeOffset result))
             {
                 return result;
             }
             else
             {
-                return DateTime.MinValue;
+                return DateTimeOffset.MinValue;
             }
         }
         private List<string> ListLogFiles()
         {
-            var filenames = new List<Tuple<DateTime, string>>();
+            if (!Directory.Exists(basePath))
+                Directory.CreateDirectory(basePath);
+
+            var filenames = new List<Tuple<DateTimeOffset, string>>();
 
             foreach (var path in Directory.GetFiles(basePath))
             {
@@ -55,11 +59,10 @@ namespace FanSync.Logging
                     var name = Path.GetFileNameWithoutExtension(filename);
 
                     string[] parts = name.Split(new char[] { '-' }, 2);
-                    DateTime d = DateTime.MinValue;
+                    DateTimeOffset d = DateTimeOffset.MinValue;
                     if (parts.Length == 2)
                         d = ParseDate(parts[1]);
 
-                    // TODO need to account for basePath
                     filenames.Add(Tuple.Create(d, path));
                 }
             }
@@ -69,8 +72,8 @@ namespace FanSync.Logging
 
         private string GenerateFilename()
         {
-            var dateStr = DateTime.Now.ToString("yyMMdd-HHmmss");
-            var newFilename = Path.Combine(basePath, $"{filename}-{dateStr}");
+            var dateStr = DateTimeOffset.Now.ToString("yyMMdd-HHmmss");
+            var newFilename = Path.Combine(basePath, $"{filename}-{dateStr}.log");
             return newFilename;
         }
 
@@ -83,13 +86,15 @@ namespace FanSync.Logging
                     var filenames = ListLogFiles();
                     var currentFilename = filenames.LastOrDefault() ?? GenerateFilename();
                     currentStream = new FileStream(currentFilename, FileMode.Append, FileAccess.Write);
+                    currentWriter = new StreamWriter(currentStream);
                 }
 
                 if (currentStream.Position > sizeLimit)
                 {
-                    currentStream.Close();
+                    currentWriter.Close();
 
                     currentStream = new FileStream(GenerateFilename(), FileMode.Append, FileAccess.Write);
+                    currentWriter = new StreamWriter(currentStream, Encoding.UTF8);
 
                     var filenames = ListLogFiles();
                     for (int i = 0; i + maxFiles < filenames.Count; i++)
@@ -98,11 +103,9 @@ namespace FanSync.Logging
                     }
                 }
 
-                string date = DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss zzz", CultureInfo.InvariantCulture);
-                using (StreamWriter sw = new StreamWriter(currentStream, Encoding.UTF8))
-                    sw.Write($"[{date}] | {level,-5} | {message}\r\n");
-
-                currentStream.Flush();
+                string date = DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                currentWriter.WriteLine($"[{date}] | {level,-5} | {message}");
+                currentWriter.Flush();
             }
             catch { }
         }
