@@ -65,7 +65,7 @@
     <Compile Include="Ext\DictionaryExtensions.cs" />
     <Compile Include="HTTP\FansyncStatus.cs" />
     <Compile Include="Notification.cs" />
-    <Compile Include="Logger.cs" />
+    <Compile Include="Logging\Logger.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="Windows\KeyValueEditor.xaml.cs">
       <DependentUpon>KeyValueEditor.xaml</DependentUpon>

@@ -1,4 +1,5 @@
 ﻿using FanSync.HTTP;
+using FanSync.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -50,7 +51,7 @@ namespace FanSync
             IsRunning = false;
 
             string folder = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-            logger = new Logger(Path.Combine(folder, "importer.log"));
+            logger = new Logger(folder, "importer");
         }
 
         public void Start()
