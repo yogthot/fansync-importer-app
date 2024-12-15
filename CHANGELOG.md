@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 
 - Refactored error handling.
+- Refactored logging to limit space occupied on disk.
 
 
 ## [2.1.0.0] - 2024-07-20
