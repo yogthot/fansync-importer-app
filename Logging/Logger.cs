@@ -114,10 +114,17 @@ namespace FanSync.Logging
         {
             Log(LogLevel.ERROR, message);
         }
-
+        public void Warn(string message)
+        {
+            Log(LogLevel.WARN, message);
+        }
         public void Info(string message)
         {
             Log(LogLevel.INFO, message);
+        }
+        public void Debug(string message)
+        {
+            Log(LogLevel.DEBUG, message);
         }
     }
 }
