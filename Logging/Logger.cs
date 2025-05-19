@@ -22,15 +22,15 @@ namespace FanSync.Logging
         private const int maxFiles = 5;
 
         private string basePath;
-        private string filename;
+        private string baseFilename;
 
         private FileStream currentStream;
         private StreamWriter currentWriter;
 
-        public Logger(string basePath, string filename)
+        public Logger(string basePath, string baseFilename)
         {
             this.basePath = basePath;
-            this.filename = filename;
+            this.baseFilename = baseFilename;
         }
 
         private DateTimeOffset ParseDate(string text)
@@ -54,7 +54,7 @@ namespace FanSync.Logging
             foreach (var path in Directory.GetFiles(basePath))
             {
                 var filename = Path.GetFileName(path);
-                if (filename.StartsWith(filename) && filename.EndsWith(".log"))
+                if (filename.StartsWith(baseFilename) && filename.EndsWith(".log"))
                 {
                     var name = Path.GetFileNameWithoutExtension(filename);
 
@@ -72,8 +72,8 @@ namespace FanSync.Logging
 
         private string GenerateFilename()
         {
-            var dateStr = DateTimeOffset.Now.ToString("yyMMdd-HHmmss");
-            var newFilename = Path.Combine(basePath, $"{filename}-{dateStr}.log");
+            var dateStr = DateTimeOffset.Now.ToString(dateFormat);
+            var newFilename = Path.Combine(basePath, $"{baseFilename}-{dateStr}.log");
             return newFilename;
         }
 
@@ -97,7 +97,7 @@ namespace FanSync.Logging
                     currentWriter = new StreamWriter(currentStream, Encoding.UTF8);
 
                     var filenames = ListLogFiles();
-                    for (int i = 0; i + maxFiles < filenames.Count; i++)
+                    for (int i = 0; maxFiles + i < filenames.Count; i++)
                     {
                         File.Delete(filenames[i]);
                     }

@@ -26,6 +26,8 @@ namespace FanSync.HTTP
         public const string Endpoint = "https://www." + Domain;
         public const string ApiEndpoint = "https://api." + Domain;
 
+        private string CreatorId { get; set; }
+
         private Settings Settings { get; set; }
 
         public FanboxClient(Settings settings)
@@ -33,8 +35,32 @@ namespace FanSync.HTTP
             Settings = settings;
         }
 
+        public async Task<string> GetCreatorId()
+        {
+            if (CreatorId != null)
+                return CreatorId;
+
+            using (HttpClientHandler handler = new HttpClientHandler() { AllowAutoRedirect = false })
+            using (HttpClient client = new HttpClient(handler))
+            {
+                HttpRequestMessage request = new HttpRequestMessage()
+                {
+                    Version = HttpVersion.Version11,
+                    Method = HttpMethod.Get,
+                    RequestUri = new Uri($"https://www.pixiv.net/fanbox/creator/{Settings.pixiv_id}"),
+                    Headers = { }
+                };
+                HttpResponseMessage resp = await client.SendAsync(request);
+                // if this fails it means the pixiv id does not correspond to a creator
+                CreatorId = resp.Headers.Location.Host.Split('.')[0];
+                return CreatorId;
+            }
+        }
+
         public async Task<Tuple<FanboxStatus, string>> GetPlans()
         {
+            string creatorId = await GetCreatorId();
+
             CookieContainer fanboxCookies = new CookieContainer();
             foreach (var cookie in Settings.cookies)
             {
@@ -48,7 +74,7 @@ namespace FanSync.HTTP
                 {
                     Version = HttpVersion.Version11,
                     Method = HttpMethod.Get,
-                    RequestUri = new Uri($"{ApiEndpoint}/plan.listCreator?userId={Settings.pixiv_id}"),
+                    RequestUri = new Uri($"{ApiEndpoint}/plan.listCreator?creatorId={creatorId}"),
                     Headers = { }
                 };
                 foreach (var header in Settings.headers)
@@ -61,7 +87,7 @@ namespace FanSync.HTTP
                 if (!Settings.headers.ContainsKey("Referer"))
                     fanboxRequest.Headers.Add("Referer", Endpoint);
                 if (!Settings.headers.ContainsKey("User-Agent"))
-                    fanboxRequest.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36");
+                    fanboxRequest.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36");
 
                 HttpResponseMessage resp = await client.SendAsync(fanboxRequest);
                 if (resp.StatusCode == HttpStatusCode.Forbidden)
@@ -111,7 +137,7 @@ namespace FanSync.HTTP
                 if (!Settings.headers.ContainsKey("Referer"))
                     fanboxRequest.Headers.Add("Referer", Endpoint);
                 if (!Settings.headers.ContainsKey("User-Agent"))
-                    fanboxRequest.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36");
+                    fanboxRequest.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36");
 
                 HttpResponseMessage resp = await client.SendAsync(fanboxRequest);
                 if (resp.StatusCode == HttpStatusCode.Forbidden)
@@ -163,7 +189,7 @@ namespace FanSync.HTTP
                 if (!Settings.headers.ContainsKey("Referer"))
                     fanboxRequest.Headers.Add("Referer", Endpoint);
                 if (!Settings.headers.ContainsKey("User-Agent"))
-                    fanboxRequest.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36");
+                    fanboxRequest.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36");
 
                 HttpResponseMessage resp = await client.SendAsync(fanboxRequest);
                 return await resp.Content.ReadAsStringAsync();
